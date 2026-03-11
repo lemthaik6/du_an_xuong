@@ -1,0 +1,154 @@
+<?php
+
+namespace App\Controllers;
+
+use App\Models\User;
+
+class AuthController extends Controller
+{
+    private $userModel;
+
+    public function __construct()
+    {
+        parent::__construct();
+        $this->userModel = new User();
+    }
+
+    public function loginPage()
+    {
+        if ($this->auth->isLoggedIn()) {
+            $this->redirect('/du_an_xuong/public/dashboard');
+        }
+        
+        $flash = $this->getFlash();
+        echo $this->render('auth/login', ['flash' => $flash]);
+    }
+
+    public function register()
+    {
+        if ($this->auth->isLoggedIn()) {
+            $this->redirect('/du_an_xuong/public/dashboard');
+        }
+        
+        $flash = $this->getFlash();
+        echo $this->render('auth/register', ['flash' => $flash]);
+    }
+
+    public function handleLogin()
+    {
+        $post = $this->getPost();
+        
+        $errors = $this->validate($post, [
+            'email' => 'required|email',
+            'password' => 'required'
+        ]);
+
+        if (!empty($errors)) {
+            $this->setFlash('error', 'Vui lòng điền đủ thông tin');
+            $this->redirect('/du_an_xuong/public/login');
+            return;
+        }
+
+        $result = $this->auth->login($post['email'], $post['password']);
+
+        if ($result['success']) {
+            $this->setFlash('success', 'Đăng nhập thành công');
+            $this->redirect('/du_an_xuong/public/dashboard');
+        } else {
+            $this->setFlash('error', $result['message']);
+            $this->redirect('/du_an_xuong/public/login');
+        }
+    }
+
+    public function handleRegister()
+    {
+        $post = $this->getPost();
+        
+        $errors = $this->validate($post, [
+            'email' => 'required|email',
+            'password' => 'required|min:6',
+            'full_name' => 'required'
+        ]);
+
+        if (!empty($errors)) {
+            $this->setFlash('error', 'Vui lòng điền đủ thông tin hợp lệ');
+            $this->redirect('/du_an_xuong/public/register');
+            return;
+        }
+
+        $result = $this->auth->register($post);
+
+        if ($result['success']) {
+            $this->setFlash('success', 'Đăng ký thành công, vui lòng đăng nhập');
+            $this->redirect('/du_an_xuong/public/login');
+        } else {
+            $this->setFlash('error', $result['message']);
+            $this->redirect('/du_an_xuong/public/register');
+        }
+    }
+
+    public function logout()
+    {
+        $this->auth->logout();
+        $this->setFlash('success', 'Đã đăng xuất');
+        $this->redirect('/du_an_xuong/public/login');
+    }
+
+    public function profile()
+    {
+        $this->auth->requireLogin();
+        
+        $user = $this->userModel->getProfile($this->auth->getId());
+        echo $this->render('profile/view', ['user' => $user]);
+    }
+
+    public function editProfile()
+    {
+        $this->auth->requireLogin();
+        
+        $user = $this->userModel->find($this->auth->getId());
+        echo $this->render('profile/edit', ['user' => $user]);
+    }
+
+    public function updateProfile()
+    {
+        $this->auth->requireLogin();
+        
+        $post = $this->getPost();
+        
+        $this->userModel->updateProfile($this->auth->getId(), [
+            'full_name' => $post['full_name'],
+            'phone' => $post['phone']
+        ]);
+
+        $this->setFlash('success', 'Cập nhật hồ sơ thành công');
+        $this->redirect('/du_an_xuong/public/profile');
+    }
+
+    public function changePassword()
+    {
+        $this->auth->requireLogin();
+        echo $this->render('profile/change-password');
+    }
+
+    public function updatePassword()
+    {
+        $this->auth->requireLogin();
+        
+        $post = $this->getPost();
+        
+        $result = $this->auth->changePassword(
+            $this->auth->getId(),
+            $post['old_password'],
+            $post['new_password']
+        );
+
+        if ($result['success']) {
+            $this->setFlash('success', 'Đổi mật khẩu thành công');
+        } else {
+            $this->setFlash('error', $result['message']);
+        }
+
+        $this->redirect('/du_an_xuong/public/profile');
+    }
+}
