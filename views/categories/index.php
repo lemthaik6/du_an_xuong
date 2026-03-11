@@ -2,7 +2,12 @@
     <div class="sidebar-menu">
         <h3>Menu</h3>
         <a href="<?php echo $baseUrl; ?>/dashboard">📊 Dashboard</a>
-        <a href="<?php echo $baseUrl; ?>/categories">📑 Danh mục</a>
+        <a href="<?php echo $baseUrl; ?>/users">👥 Quản lý Người dùng</a>
+        <a href="<?php echo $baseUrl; ?>/categories">📑 Quản lý Danh mục</a>
+        <a href="<?php echo $baseUrl; ?>/projects">📌 Quản lý Dự án</a>
+        <a href="<?php echo $baseUrl; ?>/tasks">✓ Quản lý Tác vụ</a>
+        <a href="<?php echo $baseUrl; ?>/teams">👨‍💼 Quản lý Đội nhóm</a>
+        <a href="<?php echo $baseUrl; ?>/profile">⚙️ Hồ sơ của tôi</a>
     </div>
     
     <div class="main-content">
@@ -13,7 +18,7 @@
             </div>
         </div>
         
-        <?php if (!empty($categories)): ?>
+        <?php if (is_array($categories) && count($categories) > 0): ?>
             <div class="card">
                 <table>
                     <thead>
@@ -45,7 +50,10 @@
             </div>
         <?php else: ?>
             <div class="card">
-                <p>Không có danh mục nào. <a href="/du_an_xuong/public/categories/create">Tạo danh mục đầu tiên</a></p>
+                <div style="padding: 40px; text-align: center;">
+                    <p style="font-size: 18px; color: #7f8c8d; margin-bottom: 20px;">📭 Không có danh mục nào</p>
+                    <a href="<?php echo $baseUrl; ?>/categories/create" class="btn btn-success">+ Tạo danh mục đầu tiên</a>
+                </div>
             </div>
         <?php endif; ?>
     </div>

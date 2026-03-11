@@ -29,13 +29,13 @@ class UserController extends Controller
         ]);
     }
 
-    public function show()
+    public function show($id)
     {
-        if (empty($_GET['id'])) {
+        if (empty($id)) {
             $this->redirect('/du_an_xuong/public/users');
         }
 
-        $user = $this->userModel->find($_GET['id']);
+        $user = $this->userModel->find($id);
         
         if (!$user) {
             $this->setFlash('error', 'Người dùng không tồn tại');
@@ -47,7 +47,7 @@ class UserController extends Controller
 
     public function create()
     {
-        echo $this->render('users/create');
+        echo $this->render('users/form');
     }
 
     public function store()
@@ -78,7 +78,7 @@ class UserController extends Controller
             'email' => $post['email'],
             'password' => md5($post['password']),
             'full_name' => $post['full_name'],
-            'phone' => $post['phone'],
+            'phone' => !empty($post['phone']) ? $post['phone'] : null,
             'role' => $post['role'],
             'status' => 'active'
         ]);
@@ -87,48 +87,48 @@ class UserController extends Controller
         $this->redirect('/du_an_xuong/public/users');
     }
 
-    public function edit()
+    public function edit($id)
     {
-        if (empty($_GET['id'])) {
+        if (empty($id)) {
             $this->redirect('/du_an_xuong/public/users');
         }
 
-        $user = $this->userModel->find($_GET['id']);
+        $user = $this->userModel->find($id);
         
         if (!$user) {
             $this->setFlash('error', 'Người dùng không tồn tại');
             $this->redirect('/du_an_xuong/public/users');
         }
 
-        echo $this->render('users/edit', ['user' => $user]);
+        echo $this->render('users/form', ['user' => $user]);
     }
 
-    public function update()
+    public function update($id)
     {
-        if (empty($_GET['id'])) {
+        if (empty($id)) {
             $this->redirect('/du_an_xuong/public/users');
         }
 
         $post = $this->getPost();
         
-        $this->userModel->update($_GET['id'], [
+        $this->userModel->update($id, [
             'full_name' => $post['full_name'],
-            'phone' => $post['phone'],
+            'phone' => !empty($post['phone']) ? $post['phone'] : null,
             'role' => $post['role'],
             'status' => $post['status']
         ]);
 
         $this->setFlash('success', 'Cập nhật người dùng thành công');
-        $this->redirect('/du_an_xuong/public/users/' . $_GET['id']);
+        $this->redirect('/du_an_xuong/public/users/' . $id);
     }
 
-    public function delete()
+    public function delete($id)
     {
-        if (empty($_GET['id'])) {
+        if (empty($id)) {
             $this->redirect('/du_an_xuong/public/users');
         }
 
-        $this->userModel->delete($_GET['id']);
+        $this->userModel->delete($id);
 
         $this->setFlash('success', 'Xóa người dùng thành công');
         $this->redirect('/du_an_xuong/public/users');

@@ -68,31 +68,51 @@
         
         .sidebar-menu {
             width: 250px;
-            background: white;
-            padding: 20px;
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            padding: 25px 20px;
             border-radius: 8px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+            flex-shrink: 0;
+            height: fit-content;
+            position: sticky;
+            top: 20px;
+        }
+        
+        .sidebar-menu h3 {
+            margin-top: 0;
+            margin-bottom: 20px;
+            color: #ecf0f1;
+            font-size: 18px;
+            font-weight: 600;
+            border-bottom: 3px solid #3498db;
+            padding-bottom: 12px;
+            letter-spacing: 0.5px;
         }
         
         .sidebar-menu a {
             display: block;
             padding: 12px 16px;
-            color: #2c3e50;
+            color: #ecf0f1;
             text-decoration: none;
-            border-radius: 4px;
-            margin-bottom: 8px;
-            transition: background 0.3s;
+            border-radius: 6px;
+            margin-bottom: 10px;
+            transition: all 0.3s ease;
+            font-weight: 500;
+            border-left: 3px solid transparent;
         }
         
         .sidebar-menu a:hover {
-            background: #ecf0f1;
+            background: rgba(52, 152, 219, 0.3);
+            border-left-color: #3498db;
+            padding-left: 20px;
         }
         
         .main-content {
             flex: 1;
+            min-width: 0;
         }
         
-        .card {
+        .main-content .card {
             background: white;
             padding: 20px;
             border-radius: 8px;
@@ -132,13 +152,23 @@
         
         .btn {
             display: inline-block;
-            padding: 10px 20px;
+            padding: 10px 16px;
             border: none;
             border-radius: 4px;
             cursor: pointer;
             text-decoration: none;
-            transition: background 0.3s;
+            transition: all 0.3s ease;
             font-size: 14px;
+            font-weight: 500;
+            margin-right: 4px;
+            margin-bottom: 4px;
+            text-align: center;
+            vertical-align: middle;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
         }
         
         .btn-primary {
@@ -175,6 +205,12 @@
         
         .btn-warning:hover {
             background: #d68910;
+        }
+        
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            pointer-events: none;
         }
         
         .form-group {
@@ -261,6 +297,40 @@
             color: #7f8c8d;
             border-top: 1px solid #ecf0f1;
             margin-top: 40px;
+        }
+
+        /* Flex layout for sidebar and content */
+        .container > div[style*="display: flex;"] {
+            display: flex !important;
+            gap: 20px;
+            width: 100%;
+            align-items: flex-start;
+        }
+
+        .container > div[style*="display: flex;"] .sidebar-menu {
+            flex-shrink: 0;
+            width: 250px;
+        }
+
+        .container > div[style*="display: flex;"] .main-content {
+            flex: 1;
+            min-width: 0;
+            width: 100%;
+        }
+
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .container > div[style*="display: flex;"] {
+                flex-direction: column;
+            }
+            
+            .container > div[style*="display: flex;"] .sidebar-menu {
+                width: 100%;
+            }
+            
+            .sidebar-menu {
+                width: 100%;
+            }
         }
     </style>
 </head>

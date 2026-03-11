@@ -2,7 +2,12 @@
     <div class="sidebar-menu">
         <h3>Menu</h3>
         <a href="<?php echo $baseUrl; ?>/dashboard">📊 Dashboard</a>
-        <a href="<?php echo $baseUrl; ?>/teams">👨‍💼 Đội nhóm</a>
+        <a href="<?php echo $baseUrl; ?>/users">👥 Quản lý Người dùng</a>
+        <a href="<?php echo $baseUrl; ?>/categories">📑 Quản lý Danh mục</a>
+        <a href="<?php echo $baseUrl; ?>/projects">📌 Quản lý Dự án</a>
+        <a href="<?php echo $baseUrl; ?>/tasks">✓ Quản lý Tác vụ</a>
+        <a href="<?php echo $baseUrl; ?>/teams">👨‍💼 Quản lý Đội nhóm</a>
+        <a href="<?php echo $baseUrl; ?>/profile">⚙️ Hồ sơ của tôi</a>
     </div>
     
     <div class="main-content">
@@ -52,7 +57,7 @@
             </div>
         <?php else: ?>
             <div class="card">
-                <p>Không có đội nhóm nào. <a href="/du_an_xuong/public/teams/create">Tạo đội nhóm đầu tiên</a></p>
+                <p>Không có đội nhóm nào. <a href="<?php echo $baseUrl; ?>/teams/create">Tạo đội nhóm đầu tiên</a></p>
             </div>
         <?php endif; ?>
     </div>

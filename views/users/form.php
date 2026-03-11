@@ -1,7 +1,13 @@
 <div style="display: flex; gap: 20px;">
     <div class="sidebar-menu">
         <h3>Menu</h3>
-        <a href="<?php echo $baseUrl; ?>/users">👥 Người dùng</a>
+        <a href="<?php echo $baseUrl; ?>/dashboard">📊 Dashboard</a>
+        <a href="<?php echo $baseUrl; ?>/users">👥 Quản lý Người dùng</a>
+        <a href="<?php echo $baseUrl; ?>/categories">📑 Quản lý Danh mục</a>
+        <a href="<?php echo $baseUrl; ?>/projects">📌 Quản lý Dự án</a>
+        <a href="<?php echo $baseUrl; ?>/tasks">✓ Quản lý Tác vụ</a>
+        <a href="<?php echo $baseUrl; ?>/teams">👨‍💼 Quản lý Đội nhóm</a>
+        <a href="<?php echo $baseUrl; ?>/profile">⚙️ Hồ sơ của tôi</a>
     </div>
     
     <div class="main-content">
@@ -9,10 +15,12 @@
             <h2><?php echo isset($user) ? 'Chỉnh Sửa Người Dùng' : 'Tạo Người Dùng Mới'; ?></h2>
             
             <form method="POST" action="<?php echo isset($user) ? $baseUrl . '/users/' . $user['id'] . '/edit' : $baseUrl . '/users/create'; ?>">
-                <div class="form-group">
-                    <label for="username">Tên Đăng Nhập</label>
-                    <input type="text" id="username" name="username" required value="<?php echo htmlspecialchars($user['username'] ?? ''); ?>" <?php echo isset($user) ? 'readonly' : ''; ?>>
-                </div>
+                <?php if (isset($user)): ?>
+                    <div class="form-group">
+                        <label for="username">Tên Đăng Nhập</label>
+                        <input type="text" id="username" name="username" value="<?php echo htmlspecialchars($user['username'] ?? ''); ?>" readonly>
+                    </div>
+                <?php endif; ?>
                 
                 <div class="form-group">
                     <label for="email">Email</label>

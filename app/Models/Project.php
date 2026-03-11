@@ -33,7 +33,12 @@ class Project extends Model
 
     public function getByUser($userId)
     {
-        $sql = "SELECT * FROM {$this->table} WHERE assigned_to = ? OR created_by = ? ORDER BY created_at DESC";
+        $sql = "SELECT p.*, c.name as category_name, u.full_name as assigned_name
+                FROM {$this->table} p
+                LEFT JOIN categories c ON p.category_id = c.id
+                LEFT JOIN users u ON p.assigned_to = u.id
+                WHERE p.assigned_to = ? OR p.created_by = ? 
+                ORDER BY p.created_at DESC";
         return $this->db->fetchAll($sql, [$userId, $userId]);
     }
 

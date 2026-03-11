@@ -13,6 +13,12 @@ class Category extends Model
         return $this->db->fetchAll($sql);
     }
 
+    public function getActive()
+    {
+        $sql = "SELECT * FROM {$this->table} WHERE status = 'active' ORDER BY name ASC";
+        return $this->db->fetchAll($sql);
+    }
+
     public function getCategoryWithCount($id)
     {
         $sql = "SELECT c.*, COUNT(p.id) as project_count

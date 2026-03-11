@@ -2,7 +2,12 @@
     <div class="sidebar-menu">
         <h3>Menu</h3>
         <a href="<?php echo $baseUrl; ?>/dashboard">📊 Dashboard</a>
+        <a href="<?php echo $baseUrl; ?>/users">👥 Quản lý Người dùng</a>
+        <a href="<?php echo $baseUrl; ?>/categories">📑 Quản lý Danh mục</a>
         <a href="<?php echo $baseUrl; ?>/projects">📌 Quản lý Dự án</a>
+        <a href="<?php echo $baseUrl; ?>/tasks">✓ Quản lý Tác vụ</a>
+        <a href="<?php echo $baseUrl; ?>/teams">👨‍💼 Quản lý Đội nhóm</a>
+        <a href="<?php echo $baseUrl; ?>/profile">⚙️ Hồ sơ của tôi</a>
     </div>
     
     <div class="main-content">
@@ -22,21 +27,27 @@
                 
                 <div class="form-group">
                     <label for="category_id">Danh Mục</label>
-                    <select id="category_id" name="category_id" required>
-                        <option value="">-- Chọn danh mục --</option>
-                        <?php foreach ($categories as $category): ?>
-                            <option value="<?php echo $category['id']; ?>" <?php echo (isset($project) && $project['category_id'] == $category['id']) ? 'selected' : ''; ?>>
-                                <?php echo htmlspecialchars($category['name']); ?>
-                            </option>
-                        <?php endforeach; ?>
-                    </select>
+                    <?php if (!empty($categories)): ?>
+                        <select id="category_id" name="category_id" required>
+                            <option value="">-- Chọn danh mục --</option>
+                            <?php foreach ($categories as $category): ?>
+                                <option value="<?php echo $category['id']; ?>" <?php echo (isset($project) && $project['category_id'] == $category['id']) ? 'selected' : ''; ?>>
+                                    <?php echo htmlspecialchars($category['name']); ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                    <?php else: ?>
+                        <div style="padding: 10px; background: #fff3cd; border-radius: 4px; color: #856404;">
+                            ⚠️ Chưa có danh mục nào. Vui lòng <a href="<?php echo $baseUrl; ?>/categories/create" style="color: #856404; font-weight: bold;">tạo danh mục</a> trước.
+                        </div>
+                    <?php endif; ?>
                 </div>
                 
                 <div class="form-group">
                     <label for="assigned_to">Người Theo Dõi</label>
                     <select id="assigned_to" name="assigned_to">
                         <option value="">-- Chưa gán --</option>
-                        <?php foreach ($users as $user): ?>
+                        <?php foreach ($users ?? [] as $user): ?>
                             <option value="<?php echo $user['id']; ?>" <?php echo (isset($project) && $project['assigned_to'] == $user['id']) ? 'selected' : ''; ?>>
                                 <?php echo htmlspecialchars($user['full_name']); ?>
                             </option>
@@ -71,8 +82,14 @@
                     <input type="number" id="budget" name="budget" step="0.01" value="<?php echo htmlspecialchars($project['budget'] ?? ''); ?>">
                 </div>
                 
+                <div class="form-group">
+                    <label for="progress">Tiến Độ (%)</label>
+                    <input type="number" id="progress" name="progress" min="0" max="100" value="<?php echo htmlspecialchars($project['progress'] ?? 0); ?>">
+                    <small style="color: #999;">0-100%</small>
+                </div>
+                
                 <div style="display: flex; gap: 10px;">
-                    <button type="submit" class="btn btn-success">💾 Lưu</button>
+                    <button type="submit" class="btn btn-success" <?php echo empty($categories) ? 'disabled' : ''; ?>>💾 Lưu</button>
                     <a href="<?php echo $baseUrl; ?>/projects" class="btn btn-primary">← Quay Lại</a>
                 </div>
             </form>

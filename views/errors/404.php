@@ -4,5 +4,5 @@
     <p style="font-size: 16px; color: #7f8c8d; margin-bottom: 30px;">
         Xin lỗi, trang bạn tìm kiếm không tồn tại hoặc đã bị xóa.
     </p>
-    <a href="/du_an_xuong/public/dashboard" class="btn btn-primary">← Quay Lại Trang Chủ</a>
+    <a href="<?php echo $baseUrl; ?>/dashboard" class="btn btn-primary">← Quay Lại Trang Chủ</a>
 </div>

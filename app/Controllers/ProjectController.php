@@ -5,12 +5,14 @@ namespace App\Controllers;
 use App\Models\Project;
 use App\Models\Category;
 use App\Models\User;
+use App\Models\Task;
 
 class ProjectController extends Controller
 {
     private $projectModel;
     private $categoryModel;
     private $userModel;
+    private $taskModel;
 
     public function __construct()
     {
@@ -18,6 +20,7 @@ class ProjectController extends Controller
         $this->projectModel = new Project();
         $this->categoryModel = new Category();
         $this->userModel = new User();
+        $this->taskModel = new Task();
         $this->auth->requireLogin();
     }
 
@@ -46,13 +49,13 @@ class ProjectController extends Controller
         ]);
     }
 
-    public function show()
+    public function show($id)
     {
-        if (empty($_GET['id'])) {
+        if (empty($id)) {
             $this->redirect('/du_an_xuong/public/projects');
         }
 
-        $project = $this->projectModel->getProject($_GET['id']);
+        $project = $this->projectModel->getProject($id);
         
         if (!$project) {
             $this->setFlash('error', 'Dự án không tồn tại');
@@ -64,7 +67,16 @@ class ProjectController extends Controller
             $this->redirect('/du_an_xuong/public/403');
         }
 
-        echo $this->render('projects/show', ['project' => $project]);
+        // Get tasks for this project
+        $tasks = $this->taskModel->getByProject($id);
+        if (!is_array($tasks)) {
+            $tasks = [];
+        }
+
+        echo $this->render('projects/show', [
+            'project' => $project,
+            'tasks' => $tasks
+        ]);
     }
 
     public function create()
@@ -74,7 +86,15 @@ class ProjectController extends Controller
         $categories = $this->categoryModel->getActive();
         $users = $this->userModel->getRegularUsers();
         
-        echo $this->render('projects/create', [
+        // Provide empty arrays if null
+        if (!is_array($categories)) {
+            $categories = [];
+        }
+        if (!is_array($users)) {
+            $users = [];
+        }
+        
+        echo $this->render('projects/form', [
             'categories' => $categories,
             'users' => $users
         ]);
@@ -103,10 +123,11 @@ class ProjectController extends Controller
             'slug' => $this->generateSlug($post['name']),
             'category_id' => $post['category_id'],
             'status' => $post['status'],
-            'start_date' => $post['start_date'],
-            'end_date' => $post['end_date'],
-            'budget' => $post['budget'],
-            'assigned_to' => $post['assigned_to'],
+            'start_date' => !empty($post['start_date']) ? $post['start_date'] : null,
+            'end_date' => !empty($post['end_date']) ? $post['end_date'] : null,
+            'budget' => !empty($post['budget']) ? $post['budget'] : null,
+            'progress' => !empty($post['progress']) ? (int)$post['progress'] : 0,
+            'assigned_to' => !empty($post['assigned_to']) ? $post['assigned_to'] : null,
             'created_by' => $this->auth->getId()
         ]);
 
@@ -114,15 +135,15 @@ class ProjectController extends Controller
         $this->redirect('/du_an_xuong/public/projects/' . $projectId);
     }
 
-    public function edit()
+    public function edit($id)
     {
         $this->auth->requireAdmin();
         
-        if (empty($_GET['id'])) {
+        if (empty($id)) {
             $this->redirect('/du_an_xuong/public/projects');
         }
 
-        $project = $this->projectModel->find($_GET['id']);
+        $project = $this->projectModel->find($id);
         
         if (!$project) {
             $this->setFlash('error', 'Dự án không tồn tại');
@@ -131,48 +152,57 @@ class ProjectController extends Controller
 
         $categories = $this->categoryModel->getActive();
         $users = $this->userModel->getRegularUsers();
+        
+        // Provide empty arrays if null
+        if (!is_array($categories)) {
+            $categories = [];
+        }
+        if (!is_array($users)) {
+            $users = [];
+        }
 
-        echo $this->render('projects/edit', [
+        echo $this->render('projects/form', [
             'project' => $project,
             'categories' => $categories,
             'users' => $users
         ]);
     }
 
-    public function update()
+    public function update($id)
     {
         $this->auth->requireAdmin();
         
-        if (empty($_GET['id'])) {
+        if (empty($id)) {
             $this->redirect('/du_an_xuong/public/projects');
         }
 
         $post = $this->getPost();
         
-        $this->projectModel->update($_GET['id'], [
+        $this->projectModel->update($id, [
             'name' => $post['name'],
             'description' => $post['description'],
             'category_id' => $post['category_id'],
             'status' => $post['status'],
-            'start_date' => $post['start_date'],
-            'end_date' => $post['end_date'],
-            'budget' => $post['budget'],
-            'assigned_to' => $post['assigned_to']
+            'start_date' => !empty($post['start_date']) ? $post['start_date'] : null,
+            'end_date' => !empty($post['end_date']) ? $post['end_date'] : null,
+            'budget' => !empty($post['budget']) ? $post['budget'] : null,
+            'progress' => !empty($post['progress']) ? (int)$post['progress'] : 0,
+            'assigned_to' => !empty($post['assigned_to']) ? $post['assigned_to'] : null
         ]);
 
         $this->setFlash('success', 'Cập nhật dự án thành công');
-        $this->redirect('/du_an_xuong/public/projects/' . $_GET['id']);
+        $this->redirect('/du_an_xuong/public/projects/' . $id);
     }
 
-    public function delete()
+    public function delete($id)
     {
         $this->auth->requireAdmin();
         
-        if (empty($_GET['id'])) {
+        if (empty($id)) {
             $this->redirect('/du_an_xuong/public/projects');
         }
 
-        $this->projectModel->update($_GET['id'], ['status' => 'cancelled']);
+        $this->projectModel->update($id, ['status' => 'cancelled']);
 
         $this->setFlash('success', 'Xóa dự án thành công');
         $this->redirect('/du_an_xuong/public/projects');

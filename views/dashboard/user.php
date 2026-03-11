@@ -1,11 +1,11 @@
 <div style="display: flex; gap: 20px;">
     <div class="sidebar-menu">
         <h3>Menu</h3>
-        <a href="/du_an_xuong/public/dashboard">📊 Dashboard</a>
-        <a href="/du_an_xuong/public/projects">📌 Dự án của tôi</a>
-        <a href="/du_an_xuong/public/tasks">✓ Tác vụ của tôi</a>
-        <a href="/du_an_xuong/public/teams">👨‍💼 Đội nhóm</a>
-        <a href="/du_an_xuong/public/profile">⚙️ Hồ sơ của tôi</a>
+        <a href="<?php echo $baseUrl; ?>/dashboard">📊 Dashboard</a>
+        <a href="<?php echo $baseUrl; ?>/projects">📌 Dự án của tôi</a>
+        <a href="<?php echo $baseUrl; ?>/tasks">✓ Tác vụ của tôi</a>
+        <a href="<?php echo $baseUrl; ?>/teams">👨‍💼 Đội nhóm</a>
+        <a href="<?php echo $baseUrl; ?>/profile">⚙️ Hồ sơ của tôi</a>
     </div>
     
     <div class="main-content">
@@ -48,7 +48,7 @@
                                 <td><?php echo htmlspecialchars($task['project_name'] ?? 'N/A'); ?></td>
                                 <td><?php echo date('d/m/Y', strtotime($task['due_date'])); ?></td>
                                 <td>
-                                    <a href="/du_an_xuong/public/tasks/<?php echo $task['id']; ?>" class="btn btn-primary" style="font-size: 12px; padding: 6px 12px;">Xem</a>
+                                    <a href="<?php echo $baseUrl; ?>/tasks/<?php echo $task['id']; ?>" class="btn btn-primary" style="font-size: 12px; padding: 6px 12px;">Xem</a>
                                 </td>
                             </tr>
                         <?php endforeach; ?>
@@ -76,7 +76,7 @@
                                 <td><?php echo htmlspecialchars($task['project_name'] ?? 'N/A'); ?></td>
                                 <td><?php echo date('d/m/Y', strtotime($task['due_date'])); ?></td>
                                 <td>
-                                    <a href="/du_an_xuong/public/tasks/<?php echo $task['id']; ?>" class="btn btn-primary" style="font-size: 12px; padding: 6px 12px;">Xem</a>
+                                    <a href="<?php echo $baseUrl; ?>/tasks/<?php echo $task['id']; ?>" class="btn btn-primary" style="font-size: 12px; padding: 6px 12px;">Xem</a>
                                 </td>
                             </tr>
                         <?php endforeach; ?>

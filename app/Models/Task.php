@@ -21,19 +21,29 @@ class Task extends Model
     public function getByProject($projectId, $status = null)
     {
         if ($status) {
-            $sql = "SELECT * FROM {$this->table} WHERE project_id = ? AND status = ? ORDER BY created_at DESC";
+            $sql = "SELECT t.*, u.full_name as assigned_name 
+                    FROM {$this->table} t
+                    LEFT JOIN users u ON t.assigned_to = u.id
+                    WHERE t.project_id = ? AND t.status = ? 
+                    ORDER BY t.created_at DESC";
             return $this->db->fetchAll($sql, [$projectId, $status]);
         }
         
-        $sql = "SELECT * FROM {$this->table} WHERE project_id = ? ORDER BY created_at DESC";
+        $sql = "SELECT t.*, u.full_name as assigned_name 
+                FROM {$this->table} t
+                LEFT JOIN users u ON t.assigned_to = u.id
+                WHERE t.project_id = ? 
+                ORDER BY t.created_at DESC";
         return $this->db->fetchAll($sql, [$projectId]);
     }
 
     public function getAssigned($userId)
     {
-        $sql = "SELECT t.*, p.name as project_name 
+        $sql = "SELECT t.*, p.name as project_name, u.full_name as assigned_name, cu.full_name as created_name
                 FROM {$this->table} t
                 LEFT JOIN projects p ON t.project_id = p.id
+                LEFT JOIN users u ON t.assigned_to = u.id
+                LEFT JOIN users cu ON t.created_by = cu.id
                 WHERE t.assigned_to = ? AND t.status != 'completed'
                 ORDER BY t.due_date ASC";
         return $this->db->fetchAll($sql, [$userId]);

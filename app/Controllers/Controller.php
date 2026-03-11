@@ -39,7 +39,7 @@ class Controller
         include $this->viewPath . 'layout.php';
         $html = ob_get_clean();
         
-        echo $html;
+        return $html;
     }
 
     protected function response($success = true, $message = '', $data = [])

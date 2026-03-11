@@ -4,6 +4,7 @@ namespace App\Controllers;
 
 use App\Models\Task;
 use App\Models\Project;
+use App\Models\User;
 use App\Models\Comment;
 use App\Models\Attachment;
 
@@ -11,6 +12,7 @@ class TaskController extends Controller
 {
     private $taskModel;
     private $projectModel;
+    private $userModel;
     private $commentModel;
     private $attachmentModel;
 
@@ -19,6 +21,7 @@ class TaskController extends Controller
         parent::__construct();
         $this->taskModel = new Task();
         $this->projectModel = new Project();
+        $this->userModel = new User();
         $this->commentModel = new Comment();
         $this->attachmentModel = new Attachment();
         $this->auth->requireLogin();
@@ -26,36 +29,45 @@ class TaskController extends Controller
 
     public function index()
     {
-        // Hiển thị tác vụ của user
-        $tasks = $this->taskModel->getAssigned($this->auth->getId());
+        $isAdmin = $this->auth->isAdmin();
+        
+        if ($isAdmin) {
+            $page = $_GET['page'] ?? 1;
+            $tasks = $this->taskModel->paginate($page, 10);
+            $data = $tasks['data'];
+        } else {
+            $data = $this->taskModel->getAssigned($this->auth->getId());
+        }
         
         echo $this->render('tasks/index', [
-            'tasks' => $tasks,
+            'tasks' => $data,
             'overdue' => $this->taskModel->getOverdue(),
-            'upcoming' => $this->taskModel->getUpcoming()
+            'upcoming' => $this->taskModel->getUpcoming(),
+            'isAdmin' => $isAdmin
         ]);
     }
 
-    public function show()
+    public function show($id)
     {
-        if (empty($_GET['id'])) {
+        if (empty($id)) {
             $this->redirect('/du_an_xuong/public/tasks');
         }
 
-        $task = $this->taskModel->getTask($_GET['id']);
+        $task = $this->taskModel->getTask($id);
         
         if (!$task) {
             $this->setFlash('error', 'Tác vụ không tồn tại');
             $this->redirect('/du_an_xuong/public/tasks');
         }
 
-        $comments = $this->commentModel->getByTask($_GET['id']);
-        $attachments = $this->attachmentModel->getByTask($_GET['id']);
+        $comments = $this->commentModel->getByTask($id);
+        $attachments = $this->attachmentModel->getByTask($id);
 
         echo $this->render('tasks/show', [
             'task' => $task,
             'comments' => $comments,
-            'attachments' => $attachments
+            'attachments' => $attachments,
+            'isAdmin' => $this->auth->isAdmin()
         ]);
     }
 
@@ -74,14 +86,30 @@ class TaskController extends Controller
             $this->redirect('/du_an_xuong/public/projects');
         }
 
-        echo $this->render('tasks/create', [
-            'project' => $project
+        $projects = $this->projectModel->all();
+        $users = $this->userModel->all();
+        
+        // Provide empty arrays if null
+        if (!is_array($projects)) {
+            $projects = [];
+        }
+        if (!is_array($users)) {
+            $users = [];
+        }
+
+        echo $this->render('tasks/form', [
+            'project' => $project,
+            'projects' => $projects,
+            'users' => $users
         ]);
     }
 
     public function store()
     {
-        if (empty($_GET['project_id'])) {
+        // Get project_id from GET or POST
+        $project_id = $_GET['project_id'] ?? $_POST['project_id'] ?? null;
+        
+        if (empty($project_id)) {
             $this->redirect('/du_an_xuong/public/projects');
         }
 
@@ -93,17 +121,18 @@ class TaskController extends Controller
 
         if (!empty($errors)) {
             $this->setFlash('error', 'Vui lòng điền tiêu đề tác vụ');
-            $this->redirect('/du_an_xuong/public/tasks/create?project_id=' . $_GET['project_id']);
+            $this->redirect('/du_an_xuong/public/tasks/create?project_id=' . $project_id);
             return;
         }
 
         $taskId = $this->taskModel->create([
             'title' => $post['title'],
             'description' => $post['description'],
-            'project_id' => $_GET['project_id'],
-            'assigned_to' => $post['assigned_to'],
+            'project_id' => $project_id,
+            'assigned_to' => !empty($post['assigned_to']) ? $post['assigned_to'] : null,
             'status' => 'todo',
-            'due_date' => $post['due_date'],
+            'progress' => 0,
+            'due_date' => !empty($post['due_date']) ? $post['due_date'] : null,
             'created_by' => $this->auth->getId()
         ]);
 
@@ -111,59 +140,74 @@ class TaskController extends Controller
         $this->redirect('/du_an_xuong/public/tasks/' . $taskId);
     }
 
-    public function edit()
+    public function edit($id)
     {
-        if (empty($_GET['id'])) {
+        if (empty($id)) {
             $this->redirect('/du_an_xuong/public/tasks');
         }
 
-        $task = $this->taskModel->find($_GET['id']);
+        $task = $this->taskModel->find($id);
         
         if (!$task) {
             $this->setFlash('error', 'Tác vụ không tồn tại');
             $this->redirect('/du_an_xuong/public/tasks');
         }
 
-        echo $this->render('tasks/edit', ['task' => $task]);
+        $projects = $this->projectModel->all();
+        $users = $this->userModel->all();
+        
+        // Provide empty arrays if null
+        if (!is_array($projects)) {
+            $projects = [];
+        }
+        if (!is_array($users)) {
+            $users = [];
+        }
+
+        echo $this->render('tasks/form', [
+            'task' => $task,
+            'projects' => $projects,
+            'users' => $users
+        ]);
     }
 
-    public function update()
+    public function update($id)
     {
-        if (empty($_GET['id'])) {
+        if (empty($id)) {
             $this->redirect('/du_an_xuong/public/tasks');
         }
 
         $post = $this->getPost();
         
-        $this->taskModel->update($_GET['id'], [
+        $this->taskModel->update($id, [
             'title' => $post['title'],
             'description' => $post['description'],
-            'assigned_to' => $post['assigned_to'],
+            'assigned_to' => !empty($post['assigned_to']) ? $post['assigned_to'] : null,
             'status' => $post['status'],
-            'progress' => $post['progress'],
-            'due_date' => $post['due_date']
+            'progress' => !empty($post['progress']) ? $post['progress'] : 0,
+            'due_date' => !empty($post['due_date']) ? $post['due_date'] : null
         ]);
 
         // Update project progress
-        $task = $this->taskModel->find($_GET['id']);
+        $task = $this->taskModel->find($id);
         if ($task) {
             $this->projectModel->updateProgress($task['project_id']);
         }
 
         $this->setFlash('success', 'Cập nhật tác vụ thành công');
-        $this->redirect('/du_an_xuong/public/tasks/' . $_GET['id']);
+        $this->redirect('/du_an_xuong/public/tasks/' . $id);
     }
 
-    public function delete()
+    public function delete($id)
     {
-        if (empty($_GET['id'])) {
+        if (empty($id)) {
             $this->redirect('/du_an_xuong/public/tasks');
         }
 
-        $task = $this->taskModel->find($_GET['id']);
+        $task = $this->taskModel->find($id);
         $project_id = $task['project_id'];
 
-        $this->taskModel->delete($_GET['id']);
+        $this->taskModel->delete($id);
 
         $this->setFlash('success', 'Xóa tác vụ thành công');
         $this->redirect('/du_an_xuong/public/projects/' . $project_id);

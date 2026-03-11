@@ -4,5 +4,5 @@
     <p style="font-size: 16px; color: #7f8c8d; margin-bottom: 30px;">
         Bạn không có quyền truy cập vào tài nguyên này. Vui lòng đăng nhập hoặc liên hệ quản trị viên.
     </p>
-    <a href="/du_an_xuong/public/dashboard" class="btn btn-primary">← Quay Lại Trang Chủ</a>
+    <a href="<?php echo $baseUrl; ?>/dashboard" class="btn btn-primary">← Quay Lại Trang Chủ</a>
 </div>

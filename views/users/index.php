@@ -56,7 +56,7 @@
             </div>
         <?php else: ?>
             <div class="card">
-                <p>Không có người dùng nào. <a href="/du_an_xuong/public/users/create">Tạo người dùng đầu tiên</a></p>
+                <p>Không có người dùng nào. <a href="<?php echo $baseUrl; ?>/users/create">Tạo người dùng đầu tiên</a></p>
             </div>
         <?php endif; ?>
     </div>
