@@ -27,17 +27,42 @@ class ProjectController extends Controller
     public function index()
     {
         $page = $_GET['page'] ?? 1;
+        $search = $_GET['search'] ?? '';
+        $filters = [
+            'category_id' => $_GET['category_id'] ?? '',
+            'status' => $_GET['status'] ?? '',
+            'assigned_to' => $_GET['assigned_to'] ?? '',
+            'budget_min' => $_GET['budget_min'] ?? '',
+            'budget_max' => $_GET['budget_max'] ?? ''
+        ];
         
         // Admin xem tất cả, User xem các dự án được gán
         if ($this->auth->isAdmin()) {
-            $projects = $this->projectModel->paginate($page, 10);
-            $data = $projects['data'];
-            $total = $projects['total'];
-            $pages = $projects['pages'];
-        } else {
-            $data = $this->projectModel->getByUser($this->auth->getId());
+            if (!empty($search)) {
+                $data = $this->projectModel->search($search, $filters, $page, 10);
+            } else {
+                $projects = $this->projectModel->paginate($page, 10);
+                $data = $projects['data'];
+            }
             $total = count($data);
-            $pages = 1;
+            $pages = ceil($total / 10);
+            
+            // Get filter options
+            $categories = $this->categoryModel->getActive();
+            $users = $this->userModel->getRegularUsers();
+            
+            if (!is_array($categories)) $categories = [];
+            if (!is_array($users)) $users = [];
+        } else {
+            if (!empty($search)) {
+                $data = $this->projectModel->searchByUser($this->auth->getId(), $search, $filters, $page, 10);
+            } else {
+                $data = $this->projectModel->getByUser($this->auth->getId());
+            }
+            $total = count($data);
+            $pages = ceil($total / 10);
+            $categories = [];
+            $users = [];
         }
         
         echo $this->render('projects/index', [
@@ -45,7 +70,11 @@ class ProjectController extends Controller
             'total' => $total,
             'pages' => $pages,
             'current_page' => $page,
-            'isAdmin' => $this->auth->isAdmin()
+            'isAdmin' => $this->auth->isAdmin(),
+            'search' => $search,
+            'filters' => $filters,
+            'categories' => $categories ?? [],
+            'users' => $users ?? []
         ]);
     }
 

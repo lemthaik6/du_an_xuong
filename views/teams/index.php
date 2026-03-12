@@ -12,9 +12,12 @@
     
     <div class="main-content">
         <div class="card" style="margin-bottom: 10px;">
-            <div style="display: flex; justify-content: space-between; align-items: center;">
-                <h2 style="margin: 0;">Danh Sách Đội Nhóm</h2>
-                <a href="<?php echo $baseUrl; ?>/teams/create" class="btn btn-success">+ Tạo Đội Nhóm</a>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                <div>
+                    <h2 style="margin: 0;">👨‍💼 Danh Sách Đội Nhóm</h2>
+                    <p style="color: #666; margin: 5px 0;">Quản lý các đội nhóm của dự án</p>
+                </div>
+                <a href="<?php echo $baseUrl; ?>/teams/create" class="btn btn-success" style="padding: 12px 20px;">+ Tạo Đội Nhóm</a>
             </div>
         </div>
         
@@ -27,28 +30,48 @@
                             <th>Lãnh Đạo</th>
                             <th>Số Thành Viên</th>
                             <th>Trạng Thái</th>
-                            <th>Hành Động</th>
+                            <th style="text-align: center;">Hành Động</th>
                         </tr>
                     </thead>
                     <tbody>
                         <?php foreach ($teams as $team): ?>
                             <tr>
-                                <td><strong><?php echo htmlspecialchars($team['name']); ?></strong></td>
-                                <td><?php echo htmlspecialchars($team['leader_name'] ?? 'N/A'); ?></td>
                                 <td>
-                                    <span style="background: #ecf0f1; padding: 4px 8px; border-radius: 4px;">
-                                        <?php echo $team['member_count'] ?? 0; ?>
+                                    <strong style="font-size: 15px;">👥 <?php echo htmlspecialchars($team['name']); ?></strong>
+                                    <?php if (!empty($team['description'])): ?>
+                                        <br><small style="color: #999;">
+                                            <?php echo htmlspecialchars(substr($team['description'], 0, 60)); ?>
+                                            <?php echo strlen($team['description']) > 60 ? '...' : ''; ?>
+                                        </small>
+                                    <?php endif; ?>
+                                </td>
+                                <td>
+                                    <span style="background: #e8f4f8; padding: 4px 8px; border-radius: 4px; font-size: 13px;">
+                                        <?php echo htmlspecialchars($team['leader_name'] ?? 'Chưa gán'); ?>
                                     </span>
                                 </td>
                                 <td>
-                                    <span style="background: <?php echo $team['status'] == 'active' ? '#27ae60' : '#95a5a6'; ?>; color: white; padding: 4px 8px; border-radius: 4px;">
-                                        <?php echo $team['status'] == 'active' ? 'Hoạt động' : 'Vô hiệu'; ?>
-                                    </span>
+                                    <div style="background: #ecf0f1; padding: 6px 10px; border-radius: 4px; text-align: center; font-weight: bold; display: inline-block;">
+                                        📊 <?php echo $team['member_count'] ?? 0; ?> thành viên
+                                    </div>
                                 </td>
                                 <td>
-                                    <a href="<?php echo $baseUrl; ?>/teams/<?php echo $team['id']; ?>" class="btn btn-primary" style="font-size: 12px; padding: 6px 12px;">Xem</a>
-                                    <a href="<?php echo $baseUrl; ?>/teams/<?php echo $team['id']; ?>/edit" class="btn btn-warning" style="font-size: 12px; padding: 6px 12px;">Sửa</a>
-                                    <a href="<?php echo $baseUrl; ?>/teams/<?php echo $team['id']; ?>/delete" class="btn btn-danger" style="font-size: 12px; padding: 6px 12px; margin-top: 4px;" onclick="return confirm('Bạn có chắc chắn?')">Xóa</a>
+                                    <?php if ($team['status'] == 'active'): ?>
+                                        <span style="background: #27ae60; color: white; padding: 6px 12px; border-radius: 4px; font-weight: bold;">
+                                            ✓ Hoạt động
+                                        </span>
+                                    <?php else: ?>
+                                        <span style="background: #95a5a6; color: white; padding: 6px 12px; border-radius: 4px; font-weight: bold;">
+                                            ✗ Vô hiệu
+                                        </span>
+                                    <?php endif; ?>
+                                </td>
+                                <td style="text-align: center;">
+                                    <div style="display: flex; gap: 5px; justify-content: center;">
+                                        <a href="<?php echo $baseUrl; ?>/teams/<?php echo $team['id']; ?>" class="btn btn-primary" style="font-size: 12px; padding: 6px 12px;">👁️ Xem</a>
+                                        <a href="<?php echo $baseUrl; ?>/teams/<?php echo $team['id']; ?>/edit" class="btn btn-warning" style="font-size: 12px; padding: 6px 12px;">✏️ Sửa</a>
+                                        <a href="<?php echo $baseUrl; ?>/teams/<?php echo $team['id']; ?>/delete" class="btn btn-danger" style="font-size: 12px; padding: 6px 12px;" onclick="return confirm('Xóa đội nhóm này? Hành động này không thể hoàn tác.')">🗑️ Xóa</a>
+                                    </div>
                                 </td>
                             </tr>
                         <?php endforeach; ?>
@@ -56,8 +79,10 @@
                 </table>
             </div>
         <?php else: ?>
-            <div class="card">
-                <p>Không có đội nhóm nào. <a href="<?php echo $baseUrl; ?>/teams/create">Tạo đội nhóm đầu tiên</a></p>
+            <div class="card" style="background: #f8f9fa; text-align: center; padding: 40px;">
+                <h3 style="color: #666;">Chưa có đội nhóm nào</h3>
+                <p style="color: #999;">Tạo đội nhóm đầu tiên để bắt đầu quản lý dự án</p>
+                <a href="<?php echo $baseUrl; ?>/teams/create" class="btn btn-success" style="padding: 12px 20px; display: inline-block; margin-top: 10px;">+ Tạo Đội Nhóm Đầu Tiên</a>
             </div>
         <?php endif; ?>
     </div>

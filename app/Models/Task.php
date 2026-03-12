@@ -82,4 +82,74 @@ class Task extends Model
                 FROM {$this->table}";
         return $this->db->fetchOne($sql);
     }
+
+    public function search($keyword, $filters = [], $page = 1, $limit = 10)
+    {
+        $offset = ($page - 1) * $limit;
+        $params = [];
+        
+        $sql = "SELECT t.*, p.name as project_name, u.full_name as assigned_name
+                FROM {$this->table} t
+                LEFT JOIN projects p ON t.project_id = p.id
+                LEFT JOIN users u ON t.assigned_to = u.id
+                WHERE (t.title LIKE ? OR t.description LIKE ?)";
+        
+        $params[] = "%{$keyword}%";
+        $params[] = "%{$keyword}%";
+        
+        // Filter by status
+        if (!empty($filters['status'])) {
+            $sql .= " AND t.status = ?";
+            $params[] = $filters['status'];
+        }
+        
+        // Filter by project
+        if (!empty($filters['project_id'])) {
+            $sql .= " AND t.project_id = ?";
+            $params[] = $filters['project_id'];
+        }
+        
+        // Filter by assigned user
+        if (!empty($filters['assigned_to'])) {
+            $sql .= " AND t.assigned_to = ?";
+            $params[] = $filters['assigned_to'];
+        }
+        
+        $sql .= " ORDER BY t.due_date ASC LIMIT {$limit} OFFSET {$offset}";
+        
+        return $this->db->fetchAll($sql, $params);
+    }
+
+    public function searchAssigned($userId, $keyword, $filters = [], $page = 1, $limit = 10)
+    {
+        $offset = ($page - 1) * $limit;
+        $params = [];
+        
+        $sql = "SELECT t.*, p.name as project_name, u.full_name as assigned_name
+                FROM {$this->table} t
+                LEFT JOIN projects p ON t.project_id = p.id
+                LEFT JOIN users u ON t.assigned_to = u.id
+                WHERE t.assigned_to = ?
+                AND (t.title LIKE ? OR t.description LIKE ?)";
+        
+        $params[] = $userId;
+        $params[] = "%{$keyword}%";
+        $params[] = "%{$keyword}%";
+        
+        // Filter by status
+        if (!empty($filters['status'])) {
+            $sql .= " AND t.status = ?";
+            $params[] = $filters['status'];
+        }
+        
+        // Filter by project
+        if (!empty($filters['project_id'])) {
+            $sql .= " AND t.project_id = ?";
+            $params[] = $filters['project_id'];
+        }
+        
+        $sql .= " ORDER BY t.due_date ASC LIMIT {$limit} OFFSET {$offset}";
+        
+        return $this->db->fetchAll($sql, $params);
+    }
 }

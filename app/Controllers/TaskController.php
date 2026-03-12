@@ -30,20 +30,45 @@ class TaskController extends Controller
     public function index()
     {
         $isAdmin = $this->auth->isAdmin();
+        $search = $_GET['search'] ?? '';
+        $filters = [
+            'status' => $_GET['status'] ?? '',
+            'project_id' => $_GET['project_id'] ?? '',
+            'assigned_to' => $_GET['assigned_to'] ?? ''
+        ];
         
         if ($isAdmin) {
-            $page = $_GET['page'] ?? 1;
-            $tasks = $this->taskModel->paginate($page, 10);
-            $data = $tasks['data'];
+            if (!empty($search)) {
+                $data = $this->taskModel->search($search, $filters, 1, 999);
+            } else {
+                $page = $_GET['page'] ?? 1;
+                $tasks = $this->taskModel->paginate($page, 10);
+                $data = $tasks['data'];
+            }
         } else {
-            $data = $this->taskModel->getAssigned($this->auth->getId());
+            if (!empty($search)) {
+                $data = $this->taskModel->searchAssigned($this->auth->getId(), $search, $filters, 1, 999);
+            } else {
+                $data = $this->taskModel->getAssigned($this->auth->getId());
+            }
         }
+        
+        // Get filter options
+        $projects = $this->projectModel->all();
+        $users = $this->userModel->getRegularUsers();
+        
+        if (!is_array($projects)) $projects = [];
+        if (!is_array($users)) $users = [];
         
         echo $this->render('tasks/index', [
             'tasks' => $data,
             'overdue' => $this->taskModel->getOverdue(),
             'upcoming' => $this->taskModel->getUpcoming(),
-            'isAdmin' => $isAdmin
+            'isAdmin' => $isAdmin,
+            'search' => $search,
+            'filters' => $filters,
+            'projects' => $projects,
+            'users' => $users
         ]);
     }
 

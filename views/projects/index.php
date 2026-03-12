@@ -19,6 +19,60 @@
                 <a href="<?php echo $baseUrl; ?>/projects/create" class="btn btn-success">+ Tạo Dự Án</a>
             </div>
         </div>
+
+        <!-- Search & Filter Form -->
+        <div class="card" style="margin-bottom: 20px; background: #f8f9fa;">
+            <form method="GET" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px;">
+                <div>
+                    <label style="display: block; margin-bottom: 6px; font-weight: bold; color: #333;">🔍 Tìm kiếm</label>
+                    <input type="text" name="search" placeholder="Tên hoặc mô tả..." value="<?php echo htmlspecialchars($search ?? ''); ?>" style="width: 100%; padding: 8px; border: 1px solid #bdc3c7; border-radius: 4px; box-sizing: border-box;">
+                </div>
+                
+                <?php if (!empty($categories)): ?>
+                <div>
+                    <label style="display: block; margin-bottom: 6px; font-weight: bold; color: #333;">📁 Danh Mục</label>
+                    <select name="category_id" style="width: 100%; padding: 8px; border: 1px solid #bdc3c7; border-radius: 4px; box-sizing: border-box;">
+                        <option value="">-- Tất cả --</option>
+                        <?php foreach ($categories as $cat): ?>
+                            <option value="<?php echo $cat['id']; ?>" <?php echo ($filters['category_id'] ?? '') == $cat['id'] ? 'selected' : ''; ?>>
+                                <?php echo htmlspecialchars($cat['name']); ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+                <?php endif; ?>
+                
+                <div>
+                    <label style="display: block; margin-bottom: 6px; font-weight: bold; color: #333;">📊 Trạng Thái</label>
+                    <select name="status" style="width: 100%; padding: 8px; border: 1px solid #bdc3c7; border-radius: 4px; box-sizing: border-box;">
+                        <option value="">-- Tất cả --</option>
+                        <option value="planning" <?php echo ($filters['status'] ?? '') == 'planning' ? 'selected' : ''; ?>>Lên kế hoạch</option>
+                        <option value="in_progress" <?php echo ($filters['status'] ?? '') == 'in_progress' ? 'selected' : ''; ?>>Đang tiến hành</option>
+                        <option value="completed" <?php echo ($filters['status'] ?? '') == 'completed' ? 'selected' : ''; ?>>Hoàn thành</option>
+                        <option value="cancelled" <?php echo ($filters['status'] ?? '') == 'cancelled' ? 'selected' : ''; ?>>Hủy</option>
+                    </select>
+                </div>
+                
+                <?php if (!empty($users)): ?>
+                <div>
+                    <label style="display: block; margin-bottom: 6px; font-weight: bold; color: #333;">👤 Người Theo Dõi</label>
+                    <select name="assigned_to" style="width: 100%; padding: 8px; border: 1px solid #bdc3c7; border-radius: 4px; box-sizing: border-box;">
+                        <option value="">-- Tất cả --</option>
+                        <?php foreach ($users as $user): ?>
+                            <option value="<?php echo $user['id']; ?>" <?php echo ($filters['assigned_to'] ?? '') == $user['id'] ? 'selected' : ''; ?>>
+                                <?php echo htmlspecialchars($user['full_name']); ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+                <?php endif; ?>
+                
+                <div style="display: flex; gap: 8px; align-items: flex-end;">
+                    <button type="submit" class="btn btn-primary" style="flex: 1;">🔎 Tìm Kiếm</button>
+                    <a href="<?php echo $baseUrl; ?>/projects" class="btn btn-secondary" style="padding: 8px 16px;">Đặt Lại</a>
+                </div>
+            </form>
+        </div>
         
         <?php if (!empty($projects)): ?>
             <div class="card">
@@ -83,6 +137,31 @@
             <h2 style="margin: 0;">🚀 Dự Án Của Tôi</h2>
             <a href="<?php echo $baseUrl; ?>/dashboard" class="btn btn-primary">← Quay Lại Dashboard</a>
         </div>
+    </div>
+
+    <!-- Search Form -->
+    <div class="card" style="margin-bottom: 20px; background: #f8f9fa;">
+        <form method="GET" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px;">
+            <div>
+                <label style="display: block; margin-bottom: 6px; font-weight: bold; color: #333;">🔍 Tìm kiếm</label>
+                <input type="text" name="search" placeholder="Tên hoặc mô tả..." value="<?php echo htmlspecialchars($search ?? ''); ?>" style="width: 100%; padding: 8px; border: 1px solid #bdc3c7; border-radius: 4px; box-sizing: border-box;">
+            </div>
+            
+            <div>
+                <label style="display: block; margin-bottom: 6px; font-weight: bold; color: #333;">📊 Trạng Thái</label>
+                <select name="status" style="width: 100%; padding: 8px; border: 1px solid #bdc3c7; border-radius: 4px; box-sizing: border-box;">
+                    <option value="">-- Tất cả --</option>
+                    <option value="planning" <?php echo ($filters['status'] ?? '') == 'planning' ? 'selected' : ''; ?>>Lên kế hoạch</option>
+                    <option value="in_progress" <?php echo ($filters['status'] ?? '') == 'in_progress' ? 'selected' : ''; ?>>Đang tiến hành</option>
+                    <option value="completed" <?php echo ($filters['status'] ?? '') == 'completed' ? 'selected' : ''; ?>>Hoàn thành</option>
+                </select>
+            </div>
+            
+            <div style="display: flex; gap: 8px; align-items: flex-end;">
+                <button type="submit" class="btn btn-primary" style="flex: 1;">🔎 Tìm Kiếm</button>
+                <a href="<?php echo $baseUrl; ?>/projects" class="btn btn-secondary" style="padding: 8px 16px;">Đặt Lại</a>
+            </div>
+        </form>
     </div>
     
     <?php if (!empty($projects)): ?>

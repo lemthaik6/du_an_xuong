@@ -5,7 +5,7 @@ namespace App\Models;
 class Team extends Model
 {
     protected $table = 'teams';
-    protected $fillable = ['name', 'description', 'leader_id', 'status'];
+    protected $fillable = ['name', 'description', 'leader_id', 'status', 'created_by'];
 
     public function getTeam($id)
     {
@@ -45,17 +45,17 @@ class Team extends Model
 
     public function getTeamMembers($teamId)
     {
-        $sql = "SELECT u.* FROM users u
+        $sql = "SELECT u.*, tm.id as team_member_id, tm.position, tm.joined_at FROM users u
                 INNER JOIN team_members tm ON u.id = tm.user_id
                 WHERE tm.team_id = ?
                 ORDER BY u.full_name ASC";
         return $this->db->fetchAll($sql, [$teamId]);
     }
 
-    public function addMember($teamId, $userId)
+    public function addMember($teamId, $userId, $position = null)
     {
-        $sql = "INSERT INTO team_members (team_id, user_id) VALUES (?, ?)";
-        return $this->db->execute($sql, [$teamId, $userId]);
+        $sql = "INSERT INTO team_members (team_id, user_id, position, joined_at) VALUES (?, ?, ?, NOW())";
+        return $this->db->execute($sql, [$teamId, $userId, $position]);
     }
 
     public function removeMember($teamId, $userId)

@@ -99,7 +99,7 @@ class AuthController extends Controller
         $this->auth->requireLogin();
         
         $user = $this->userModel->getProfile($this->auth->getId());
-        echo $this->render('profile/view', ['user' => $user]);
+        echo $this->render('auth/profile', ['user' => $user]);
     }
 
     public function editProfile()
@@ -107,7 +107,7 @@ class AuthController extends Controller
         $this->auth->requireLogin();
         
         $user = $this->userModel->find($this->auth->getId());
-        echo $this->render('profile/edit', ['user' => $user]);
+        echo $this->render('auth/edit_profile', ['user' => $user]);
     }
 
     public function updateProfile()
@@ -128,7 +128,7 @@ class AuthController extends Controller
     public function changePassword()
     {
         $this->auth->requireLogin();
-        echo $this->render('profile/change-password');
+        echo $this->render('auth/change_password');
     }
 
     public function updatePassword()
@@ -136,6 +136,13 @@ class AuthController extends Controller
         $this->auth->requireLogin();
         
         $post = $this->getPost();
+        
+        // Validate that new password and confirm password match
+        if ($post['new_password'] !== $post['confirm_password']) {
+            $this->setFlash('error', 'Mật khẩu mới và xác nhận không trùng khớp');
+            $this->redirect('/du_an_xuong/public/profile/change-password');
+            return;
+        }
         
         $result = $this->auth->changePassword(
             $this->auth->getId(),

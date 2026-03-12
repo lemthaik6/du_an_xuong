@@ -70,4 +70,85 @@ class Project extends Model
                 FROM {$this->table}";
         return $this->db->fetchOne($sql);
     }
+
+    public function search($keyword, $filters = [], $page = 1, $limit = 10)
+    {
+        $offset = ($page - 1) * $limit;
+        $params = [];
+        
+        $sql = "SELECT p.*, c.name as category_name, u.full_name as assigned_name
+                FROM {$this->table} p
+                LEFT JOIN categories c ON p.category_id = c.id
+                LEFT JOIN users u ON p.assigned_to = u.id
+                WHERE (p.name LIKE ? OR p.description LIKE ?)";
+        
+        $params[] = "%{$keyword}%";
+        $params[] = "%{$keyword}%";
+        
+        // Filter by category
+        if (!empty($filters['category_id'])) {
+            $sql .= " AND p.category_id = ?";
+            $params[] = $filters['category_id'];
+        }
+        
+        // Filter by status
+        if (!empty($filters['status'])) {
+            $sql .= " AND p.status = ?";
+            $params[] = $filters['status'];
+        }
+        
+        // Filter by assigned user
+        if (!empty($filters['assigned_to'])) {
+            $sql .= " AND p.assigned_to = ?";
+            $params[] = $filters['assigned_to'];
+        }
+        
+        // Filter by budget range
+        if (!empty($filters['budget_min'])) {
+            $sql .= " AND p.budget >= ?";
+            $params[] = $filters['budget_min'];
+        }
+        if (!empty($filters['budget_max'])) {
+            $sql .= " AND p.budget <= ?";
+            $params[] = $filters['budget_max'];
+        }
+        
+        $sql .= " ORDER BY p.created_at DESC LIMIT {$limit} OFFSET {$offset}";
+        
+        return $this->db->fetchAll($sql, $params);
+    }
+
+    public function searchByUser($userId, $keyword, $filters = [], $page = 1, $limit = 10)
+    {
+        $offset = ($page - 1) * $limit;
+        $params = [];
+        
+        $sql = "SELECT p.*, c.name as category_name, u.full_name as assigned_name
+                FROM {$this->table} p
+                LEFT JOIN categories c ON p.category_id = c.id
+                LEFT JOIN users u ON p.assigned_to = u.id
+                WHERE (p.assigned_to = ? OR p.created_by = ?)
+                AND (p.name LIKE ? OR p.description LIKE ?)";
+        
+        $params[] = $userId;
+        $params[] = $userId;
+        $params[] = "%{$keyword}%";
+        $params[] = "%{$keyword}%";
+        
+        // Filter by category
+        if (!empty($filters['category_id'])) {
+            $sql .= " AND p.category_id = ?";
+            $params[] = $filters['category_id'];
+        }
+        
+        // Filter by status
+        if (!empty($filters['status'])) {
+            $sql .= " AND p.status = ?";
+            $params[] = $filters['status'];
+        }
+        
+        $sql .= " ORDER BY p.created_at DESC LIMIT {$limit} OFFSET {$offset}";
+        
+        return $this->db->fetchAll($sql, $params);
+    }
 }

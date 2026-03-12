@@ -37,9 +37,9 @@
         </div>
         
         <div class="card">
-            <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
                 <h2 style="margin: 0;">👥 Thành Viên Đội</h2>
-                <a href="#" onclick="openAddMemberForm('<?php echo $team['id']; ?>')" class="btn btn-success">+ Thêm Thành Viên</a>
+                <button onclick="openAddMemberForm('<?php echo $team['id']; ?>')" class="btn btn-success" style="cursor: pointer;">+ Thêm Thành Viên</button>
             </div>
             
             <?php if (!empty($members)): ?>
@@ -58,60 +58,94 @@
                             <tr>
                                 <td><?php echo htmlspecialchars($member['full_name']); ?></td>
                                 <td><?php echo htmlspecialchars($member['email']); ?></td>
-                                <td><?php echo htmlspecialchars($member['position'] ?? 'N/A'); ?></td>
-                                <td><?php echo date('d/m/Y', strtotime($member['joined_at'])); ?></td>
                                 <td>
-                                    <a href="<?php echo $baseUrl; ?>/teams/<?php echo $team['id']; ?>/remove-member/<?php echo $member['user_id']; ?>" class="btn btn-danger" style="font-size: 12px; padding: 6px 12px;" onclick="return confirm('Bạn có chắc chắn?')">Xóa</a>
+                                    <?php if (!empty($member['position'])): ?>
+                                        <span style="background: #ecf0f1; padding: 4px 8px; border-radius: 4px;">
+                                            <?php echo htmlspecialchars($member['position']); ?>
+                                        </span>
+                                    <?php else: ?>
+                                        <span style="color: #999;">Chưa cập nhật</span>
+                                    <?php endif; ?>
+                                </td>
+                                <td><?php echo $member['joined_at'] ? date('d/m/Y', strtotime($member['joined_at'])) : 'N/A'; ?></td>
+                                <td>
+                                    <a href="<?php echo $baseUrl; ?>/teams/<?php echo $team['id']; ?>/remove-member/<?php echo $member['id']; ?>" class="btn btn-danger" style="font-size: 12px; padding: 6px 12px;" onclick="return confirm('Xóa thành viên này khỏi đội?')">Xóa</a>
                                 </td>
                             </tr>
                         <?php endforeach; ?>
                     </tbody>
                 </table>
             <?php else: ?>
-                <p>Chưa có thành viên nào trong đội.</p>
+                <p style="color: #999; font-style: italic;">Chưa có thành viên nào trong đội. <a href="#" onclick="openAddMemberForm('<?php echo $team['id']; ?>'); return false;">Thêm thành viên đầu tiên</a></p>
             <?php endif; ?>
         </div>
         
         <!-- Add Member Modal -->
         <div id="addMemberModal" style="display: none; margin-top: 20px;">
-            <div class="card">
-                <h2>Thêm Thành Viên Mới</h2>
-                <form method="POST" action="<?php echo $baseUrl; ?>/teams/add-member">
+            <div class="card" style="background: #f8f9fa; border: 2px solid #3498db;">
+                <h3 style="margin-top: 0; color: #3498db;">➕ Thêm Thành Viên Mới</h3>
+                <form method="POST" action="<?php echo $baseUrl; ?>/teams/add-member" onsubmit="return validateAddMemberForm()">
                     <input type="hidden" name="team_id" id="team_id" value="">
                     
                     <div class="form-group">
-                        <label for="user_id">Người Dùng</label>
+                        <label for="user_id"><strong>👤 Người Dùng</strong> <span style="color: red;">*</span></label>
                         <select id="user_id" name="user_id" required>
                             <option value="">-- Chọn người dùng --</option>
                             <?php if (isset($available_users)): ?>
                                 <?php foreach ($available_users as $user): ?>
-                                    <option value="<?php echo $user['id']; ?>"><?php echo htmlspecialchars($user['full_name']); ?></option>
+                                    <option value="<?php echo $user['id']; ?>"><?php echo htmlspecialchars($user['full_name']); ?> (<?php echo htmlspecialchars($user['email']); ?>)</option>
                                 <?php endforeach; ?>
                             <?php endif; ?>
                         </select>
+                        <small style="color: #999;">Chọn một người dùng từ danh sách</small>
                     </div>
                     
                     <div class="form-group">
-                        <label for="position">Vị Trí</label>
-                        <input type="text" id="position" name="position" placeholder="Ví dụ: Frontend Developer">
+                        <label for="position"><strong>💼 Vị Trí/Chức Vụ</strong></label>
+                        <input type="text" id="position" name="position" placeholder="Ví dụ: Frontend Developer, Project Manager..." style="width: 100%; padding: 10px;">
+                        <small style="color: #999;">Tùy chọn - Mô tả vị trí/chức vụ của thành viên trong đội</small>
                     </div>
                     
-                    <div style="display: flex; gap: 10px;">
-                        <button type="submit" class="btn btn-success">Thêm Thành Viên</button>
-                        <button type="button" class="btn btn-primary" onclick="closeAddMemberForm()">Hủy</button>
+                    <div style="display: flex; gap: 10px; margin-top: 20px;">
+                        <button type="submit" class="btn btn-success" style="cursor: pointer;">✓ Thêm Thành Viên</button>
+                        <button type="button" class="btn btn-secondary" onclick="closeAddMemberForm()" style="cursor: pointer;">✕ Hủy</button>
                     </div>
                 </form>
             </div>
         </div>
     </div>
 </div>
-</div>
+
+<script>
 function openAddMemberForm(teamId) {
     document.getElementById('team_id').value = teamId;
+    document.getElementById('user_id').value = '';
+    document.getElementById('position').value = '';
     document.getElementById('addMemberModal').style.display = 'block';
+    document.getElementById('user_id').focus();
 }
 
 function closeAddMemberForm() {
     document.getElementById('addMemberModal').style.display = 'none';
+    document.getElementById('user_id').value = '';
+    document.getElementById('position').value = '';
 }
+
+function validateAddMemberForm() {
+    const userId = document.getElementById('user_id').value;
+    if (!userId) {
+        alert('Vui lòng chọn người dùng');
+        document.getElementById('user_id').focus();
+        return false;
+    }
+    return true;
+}
+
+// Close modal when clicking outside
+document.addEventListener('click', function(event) {
+    const modal = document.getElementById('addMemberModal');
+    if (event.target === modal) {
+        closeAddMemberForm();
+    }
+});
 </script>

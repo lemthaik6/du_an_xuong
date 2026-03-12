@@ -127,12 +127,14 @@ class TeamController extends Controller
     public function addMember()
     {
         if (empty($_POST['team_id']) || empty($_POST['user_id'])) {
+            $this->setFlash('error', 'Vui lòng chọn đội và người dùng');
             return;
         }
 
         $this->teamModel->addMember(
             $_POST['team_id'],
-            $_POST['user_id']
+            $_POST['user_id'],
+            $_POST['position'] ?? null
         );
 
         $this->setFlash('success', 'Thêm thành viên thành công');
