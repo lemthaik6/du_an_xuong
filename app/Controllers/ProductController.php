@@ -64,6 +64,14 @@ class ProductController extends Controller
             'status' => $post['status'] ?? 'active'
         ];
 
+        // Handle image upload
+        if (!empty($_FILES['image']['name'])) {
+            $imagePath = $this->uploadImage($_FILES['image']);
+            if ($imagePath) {
+                $data['image'] = $imagePath;
+            }
+        }
+
         $productId = $this->productModel->create($data);
 
         if ($productId) {
@@ -126,6 +134,19 @@ class ProductController extends Controller
             'status' => $post['status'] ?? 'active'
         ];
 
+        // Handle image upload
+        if (!empty($_FILES['image']['name'])) {
+            // Delete old image if exists
+            if (!empty($product['image']) && file_exists(__DIR__ . '/../../' . $product['image'])) {
+                unlink(__DIR__ . '/../../' . $product['image']);
+            }
+            
+            $imagePath = $this->uploadImage($_FILES['image']);
+            if ($imagePath) {
+                $data['image'] = $imagePath;
+            }
+        }
+
         $this->productModel->update($id, $data);
         
         $this->setFlash('success', 'Cập nhật sản phẩm thành công');
@@ -148,6 +169,49 @@ class ProductController extends Controller
         
         $this->setFlash('success', 'Xóa sản phẩm thành công');
         $this->redirect('/du_an_xuong/public/products');
+    }
+
+    /**
+     * Handle image upload for products
+     * @param array $file File from $_FILES
+     * @return string|null Image path or null if upload failed
+     */
+    private function uploadImage($file)
+    {
+        // Validate file
+        $allowed = ['jpg', 'jpeg', 'png', 'gif'];
+        $filename = basename($file['name']);
+        $ext = strtolower(pathinfo($filename, PATHINFO_EXTENSION));
+        
+        if (!in_array($ext, $allowed)) {
+            $this->setFlash('warning', 'Chỉ hỗ trợ file ảnh: JPG, PNG, GIF');
+            return null;
+        }
+        
+        if ($file['size'] > 5 * 1024 * 1024) {
+            $this->setFlash('warning', 'Kích thước file tối đa là 5MB');
+            return null;
+        }
+        
+        if ($file['error'] !== UPLOAD_ERR_OK) {
+            $this->setFlash('warning', 'Lỗi khi upload file');
+            return null;
+        }
+        
+        // Create unique filename
+        $uploadDir = __DIR__ . '/../../storage/uploads/products/';
+        if (!is_dir($uploadDir)) {
+            mkdir($uploadDir, 0755, true);
+        }
+        
+        $newFilename = 'product_' . time() . '_' . rand(1000, 9999) . '.' . $ext;
+        $uploadPath = $uploadDir . $newFilename;
+        
+        if (move_uploaded_file($file['tmp_name'], $uploadPath)) {
+            return 'storage/uploads/products/' . $newFilename;
+        }
+        
+        return null;
     }
 
     // ===== CUSTOMER SHOP =====

@@ -91,7 +91,7 @@ $formAction = $isEdit ? $baseUrl . "/products/{$product['id']}/edit" : $baseUrl 
             <p>Quản lý thông tin sản phẩm</p>
         </div>
 
-        <form method="POST" action="<?php echo $formAction; ?>" class="form-body">
+        <form method="POST" action="<?php echo $formAction; ?>" class="form-body" enctype="multipart/form-data">
             <div class="form-group">
                 <label for="name">Tên Sản Phẩm <span class="required">*</span></label>
                 <input 
@@ -167,6 +167,63 @@ $formAction = $isEdit ? $baseUrl . "/products/{$product['id']}/edit" : $baseUrl 
                     </select>
                 </div>
             </div>
+
+            <div class="form-group">
+                <label for="image">Hình Ảnh Sản Phẩm</label>
+                <input 
+                    type="file" 
+                    id="image" 
+                    name="image" 
+                    accept="image/*"
+                    onchange="previewImage(event)"
+                >
+                <p class="help-text">Chọn file ảnh (JPG, PNG, GIF) - Tối đa 5MB</p>
+                
+                <?php if (!empty($product) && !empty($product['image'])): ?>
+                    <div style="margin-top: 15px;">
+                        <p style="margin-bottom: 8px; font-weight: bold;">Ảnh hiện tại:</p>
+                        <img id="currentImage" src="<?php echo htmlspecialchars($product['image']); ?>" alt="Product Image" style="max-width: 200px; border-radius: 6px; border: 1px solid #ddd;">
+                    </div>
+                <?php endif; ?>
+                
+                <div id="imagePreview" style="margin-top: 15px; display: none;">
+                    <p style="margin-bottom: 8px; font-weight: bold;">Xem trước:</p>
+                    <img id="preview" style="max-width: 200px; border-radius: 6px; border: 1px solid #ddd;">
+                </div>
+            </div>
+
+            <script>
+                function previewImage(event) {
+                    const file = event.target.files[0];
+                    const preview = document.getElementById('preview');
+                    const previewDiv = document.getElementById('imagePreview');
+                    const currentImage = document.getElementById('currentImage');
+                    
+                    if (file) {
+                        // Validate file size (5MB max)
+                        if (file.size > 5 * 1024 * 1024) {
+                            alert('Kích thước file tối đa là 5MB');
+                            event.target.value = '';
+                            return;
+                        }
+                        
+                        const reader = new FileReader();
+                        reader.onload = function(e) {
+                            preview.src = e.target.result;
+                            previewDiv.style.display = 'block';
+                            if (currentImage) {
+                                currentImage.style.display = 'none';
+                            }
+                        };
+                        reader.readAsDataURL(file);
+                    } else {
+                        previewDiv.style.display = 'none';
+                        if (currentImage) {
+                            currentImage.style.display = 'block';
+                        }
+                    }
+                }
+            </script>
 
             <div class="form-actions">
                 <a href="<?php echo $baseUrl; ?>/products" class="btn btn-warning">Hủy</a>

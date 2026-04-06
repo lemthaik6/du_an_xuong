@@ -170,6 +170,7 @@
                     <thead>
                         <tr>
                             <th style="width: 50px;">ID</th>
+                            <th style="width: 100px;">Ảnh</th>
                             <th>Tên Sản Phẩm</th>
                         <th style="width: 120px;">Giá</th>
                         <th style="width: 80px;">Stock</th>
@@ -182,6 +183,15 @@
                     <?php foreach ($products as $product): ?>
                         <tr>
                             <td><?php echo $product['id']; ?></td>
+                            <td>
+                                <?php if (!empty($product['image'])): ?>
+                                    <img src="<?php echo htmlspecialchars($product['image']); ?>" alt="<?php echo htmlspecialchars($product['name']); ?>" style="width: 80px; height: 80px; object-fit: cover; border-radius: 4px;">
+                                <?php else: ?>
+                                    <div style="width: 80px; height: 80px; background: #ecf0f1; border-radius: 4px; display: flex; align-items: center; justify-content: center; color: #999;">
+                                        📷
+                                    </div>
+                                <?php endif; ?>
+                            </td>
                             <td>
                                 <strong><?php echo htmlspecialchars($product['name']); ?></strong><br>
                                 <small style="color: #7f8c8d;">

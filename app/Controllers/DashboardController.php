@@ -43,21 +43,37 @@ class DashboardController extends Controller
 
     private function adminDashboard()
     {
-        $projectStats = $this->projectModel->getStats();
-        $taskStats = $this->taskModel->getStats();
+        // Lấy thống kê đếm
         $totalUsers = $this->userModel->count();
+        $totalProjects = $this->projectModel->count();
+        $totalTeams = $this->teamModel->count();
         
-        $recentProjects = $this->projectModel->getActive();
+        $taskStats = $this->taskModel->getStats();
+        $totalTasks = $taskStats['total'] ?? 0;
+        
+        // Lấy dữ liệu cho các card
+        $recentProjects = $this->projectModel->all('created_at', 'DESC');
         $overdueTasks = $this->taskModel->getOverdue();
         $upcomingTasks = $this->taskModel->getUpcoming();
+        $allTeams = $this->teamModel->all('created_at', 'DESC');
+
+        // Chuẩn bị stats array
+        $stats = [
+            'total_users' => $totalUsers,
+            'total_projects' => $totalProjects,
+            'total_tasks' => $totalTasks,
+            'total_teams' => $totalTeams,
+            'todo_tasks' => $taskStats['todo'] ?? 0,
+            'in_progress_tasks' => $taskStats['in_progress'] ?? 0,
+            'completed_tasks' => $taskStats['completed'] ?? 0
+        ];
 
         echo $this->render('dashboard/admin', [
-            'projectStats' => $projectStats,
-            'taskStats' => $taskStats,
-            'totalUsers' => $totalUsers,
+            'stats' => $stats,
             'recentProjects' => $recentProjects,
             'overdueTasks' => $overdueTasks,
-            'upcomingTasks' => $upcomingTasks
+            'upcomingTasks' => $upcomingTasks,
+            'allTeams' => $allTeams
         ]);
     }
 
