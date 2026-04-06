@@ -54,6 +54,54 @@
             </div>
         </div>
         
+        <!-- TASK MEMBERS ASSIGNMENT SECTION -->
+        <?php if ($isAdmin): ?>
+        <div class="card" style="background: #e8f4f8; border: 2px solid #3498db;">
+            <h2 style="color: #2980b9;">👥 Phân Công Thành Viên Làm Tác Vụ</h2>
+            
+            <form method="POST" action="<?php echo $baseUrl; ?>/tasks/<?php echo $task['id']; ?>/update-members">
+                <input type="hidden" name="task_id" value="<?php echo $task['id']; ?>">
+                
+                <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 15px; margin: 20px 0;">
+                    <?php 
+                    if (!empty($allTeamMembers)): 
+                        $assignedIds = [];
+                        if (!empty($assignedMembers)) {
+                            foreach ($assignedMembers as $member) {
+                                $assignedIds[$member['id']] = true;
+                            }
+                        }
+                    ?>
+                        <?php foreach ($allTeamMembers as $member): ?>
+                            <label style="display: flex; align-items: center; gap: 10px; padding: 10px; background: white; border-radius: 5px; cursor: pointer;">
+                                <input type="checkbox" name="member_ids[]" value="<?php echo $member['id']; ?>" <?php echo isset($assignedIds[$member['id']]) ? 'checked' : ''; ?> style="width: 18px; height: 18px; cursor: pointer;">
+                                <span style="flex: 1;"><?php echo htmlspecialchars($member['full_name']); ?></span>
+                                <span style="color: #7f8c8d; font-size: 12px;">📧 <?php echo htmlspecialchars($member['email']); ?></span>
+                            </label>
+                        <?php endforeach; ?>
+                    <?php else: ?>
+                        <p style="color: #e74c3c;">⚠️ Dự án này chưa có đội nhóm được gán. Vui lòng gán đội nhóm cho dự án trước.</p>
+                    <?php endif; ?>
+                </div>
+                
+                <div style="margin-top: 20px;">
+                    <button type="submit" class="btn btn-success" style="background: #27ae60; padding: 10px 20px; font-size: 14px;">💾 Cập Nhật Phân Công</button>
+                </div>
+            </form>
+            
+            <?php if (!empty($assignedMembers)): ?>
+            <div style="margin-top: 20px; padding: 15px; background: white; border-radius: 5px;">
+                <h4 style="color: #2980b9; margin-top: 0;">✅ Thành Viên Được Gán Làm Tác Vụ Này:</h4>
+                <ul style="margin: 0; padding-left: 20px;">
+                    <?php foreach ($assignedMembers as $member): ?>
+                        <li><?php echo htmlspecialchars($member['full_name']); ?> (<?php echo htmlspecialchars($member['email']); ?>)</li>
+                    <?php endforeach; ?>
+                </ul>
+            </div>
+            <?php endif; ?>
+        </div>
+        <?php endif; ?>
+        
         <div class="card">
             <div style="display: flex; justify-content: space-between; align-items: center;">
                 <h2 style="margin: 0;">Tiến Độ</h2>

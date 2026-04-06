@@ -5,14 +5,14 @@ namespace App\Models;
 class Project extends Model
 {
     protected $table = 'projects';
-    protected $fillable = ['name', 'description', 'slug', 'category_id', 'status', 'start_date', 'end_date', 'budget', 'progress', 'assigned_to', 'created_by'];
+    protected $fillable = ['name', 'description', 'slug', 'category_id', 'status', 'start_date', 'end_date', 'budget', 'progress', 'team_id', 'created_by'];
 
     public function getProject($id)
     {
-        $sql = "SELECT p.*, c.name as category_name, u.full_name as assigned_name
+        $sql = "SELECT p.*, c.name as category_name, t.name as team_name
                 FROM {$this->table} p
                 LEFT JOIN categories c ON p.category_id = c.id
-                LEFT JOIN users u ON p.assigned_to = u.id
+                LEFT JOIN teams t ON p.team_id = t.id
                 WHERE p.id = ?";
         return $this->db->fetchOne($sql, [$id]);
     }
@@ -20,10 +20,10 @@ class Project extends Model
     public function getByCategory($categoryId, $page = 1, $limit = 10)
     {
         $offset = ($page - 1) * $limit;
-        $sql = "SELECT p.*, c.name as category_name, u.full_name as assigned_name
+        $sql = "SELECT p.*, c.name as category_name, t.name as team_name
                 FROM {$this->table} p
                 LEFT JOIN categories c ON p.category_id = c.id
-                LEFT JOIN users u ON p.assigned_to = u.id
+                LEFT JOIN teams t ON p.team_id = t.id
                 WHERE p.category_id = ? AND p.status != 'cancelled'
                 ORDER BY p.created_at DESC
                 LIMIT {$limit} OFFSET {$offset}";
@@ -31,13 +31,37 @@ class Project extends Model
         return $this->db->fetchAll($sql, [$categoryId]);
     }
 
-    public function getByUser($userId)
+    public function getByTeam($teamId)
     {
-        $sql = "SELECT p.*, c.name as category_name, u.full_name as assigned_name
+        $sql = "SELECT p.*, c.name as category_name, t.name as team_name
                 FROM {$this->table} p
                 LEFT JOIN categories c ON p.category_id = c.id
-                LEFT JOIN users u ON p.assigned_to = u.id
-                WHERE p.assigned_to = ? OR p.created_by = ? 
+                LEFT JOIN teams t ON p.team_id = t.id
+                WHERE p.team_id = ?
+                ORDER BY p.created_at DESC";
+        return $this->db->fetchAll($sql, [$teamId]);
+    }
+
+    public function getByUser($userId)
+    {
+        $sql = "SELECT DISTINCT p.*, c.name as category_name, t.name as team_name
+                FROM {$this->table} p
+                LEFT JOIN categories c ON p.category_id = c.id
+                LEFT JOIN teams t ON p.team_id = t.id
+                LEFT JOIN team_members tm ON p.team_id = tm.team_id
+                WHERE tm.user_id = ? OR p.created_by = ?
+                ORDER BY p.created_at DESC";
+        return $this->db->fetchAll($sql, [$userId, $userId]);
+    }
+
+    public function getByUserTeams($userId)
+    {
+        $sql = "SELECT DISTINCT p.*, c.name as category_name, t.name as team_name
+                FROM {$this->table} p
+                LEFT JOIN categories c ON p.category_id = c.id
+                LEFT JOIN teams t ON p.team_id = t.id
+                INNER JOIN team_members tm ON p.team_id = tm.team_id
+                WHERE tm.user_id = ? OR p.created_by = ?
                 ORDER BY p.created_at DESC";
         return $this->db->fetchAll($sql, [$userId, $userId]);
     }
@@ -76,10 +100,10 @@ class Project extends Model
         $offset = ($page - 1) * $limit;
         $params = [];
         
-        $sql = "SELECT p.*, c.name as category_name, u.full_name as assigned_name
+        $sql = "SELECT p.*, c.name as category_name, t.name as team_name
                 FROM {$this->table} p
                 LEFT JOIN categories c ON p.category_id = c.id
-                LEFT JOIN users u ON p.assigned_to = u.id
+                LEFT JOIN teams t ON p.team_id = t.id
                 WHERE (p.name LIKE ? OR p.description LIKE ?)";
         
         $params[] = "%{$keyword}%";
@@ -97,10 +121,10 @@ class Project extends Model
             $params[] = $filters['status'];
         }
         
-        // Filter by assigned user
-        if (!empty($filters['assigned_to'])) {
-            $sql .= " AND p.assigned_to = ?";
-            $params[] = $filters['assigned_to'];
+        // Filter by team
+        if (!empty($filters['team_id'])) {
+            $sql .= " AND p.team_id = ?";
+            $params[] = $filters['team_id'];
         }
         
         // Filter by budget range
@@ -123,11 +147,12 @@ class Project extends Model
         $offset = ($page - 1) * $limit;
         $params = [];
         
-        $sql = "SELECT p.*, c.name as category_name, u.full_name as assigned_name
+        $sql = "SELECT DISTINCT p.*, c.name as category_name, t.name as team_name
                 FROM {$this->table} p
                 LEFT JOIN categories c ON p.category_id = c.id
-                LEFT JOIN users u ON p.assigned_to = u.id
-                WHERE (p.assigned_to = ? OR p.created_by = ?)
+                LEFT JOIN teams t ON p.team_id = t.id
+                INNER JOIN team_members tm ON p.team_id = tm.team_id
+                WHERE (tm.user_id = ? OR p.created_by = ?)
                 AND (p.name LIKE ? OR p.description LIKE ?)";
         
         $params[] = $userId;
@@ -150,5 +175,62 @@ class Project extends Model
         $sql .= " ORDER BY p.created_at DESC LIMIT {$limit} OFFSET {$offset}";
         
         return $this->db->fetchAll($sql, $params);
+    }
+
+    // ===== TEAMS MANAGEMENT =====
+    
+    /**
+     * Lấy danh sách tất cả đội nhóm được phân công cho dự án
+     */
+    public function getAssignedTeams($projectId)
+    {
+        $sql = "SELECT t.* 
+                FROM teams t
+                INNER JOIN project_teams pt ON t.id = pt.team_id
+                WHERE pt.project_id = ?
+                ORDER BY t.name ASC";
+        return $this->db->fetchAll($sql, [$projectId]);
+    }
+
+    /**
+     * Phân công multiple teams cho dự án
+     */
+    public function assignTeams($projectId, $teamIds = [])
+    {
+        // Xóa các team cũ
+        $this->db->delete('project_teams', ['project_id' => $projectId]);
+        
+        // Thêm các team mới
+        if (!empty($teamIds) && is_array($teamIds)) {
+            foreach ($teamIds as $teamId) {
+                $this->db->insert('project_teams', [
+                    'project_id' => $projectId,
+                    'team_id' => $teamId
+                ]);
+            }
+        }
+        
+        return true;
+    }
+
+    /**
+     * Kiểm tra team có được phân công cho dự án không
+     */
+    public function isTeamAssigned($projectId, $teamId)
+    {
+        $sql = "SELECT id FROM project_teams WHERE project_id = ? AND team_id = ?";
+        $result = $this->db->fetchOne($sql, [$projectId, $teamId]);
+        return !empty($result);
+    }
+
+    /**
+     * Hủy phân công team cho dự án
+     */
+    public function unassignTeam($projectId, $teamId)
+    {
+        return $this->db->delete('project_teams', [
+            'project_id' => $projectId,
+            'team_id' => $teamId
+        ]);
     }
 }

@@ -7,6 +7,8 @@ use App\Controllers\ProjectController;
 use App\Controllers\TaskController;
 use App\Controllers\CategoryController;
 use App\Controllers\TeamController;
+use App\Controllers\ContactController;
+use App\Controllers\ProductController;
 use Bramus\Router\Router;
 
 $router = new Router();
@@ -78,6 +80,7 @@ $router->post('/projects/create', ProjectController::class . '@store');
 $router->get('/projects/(\d+)', ProjectController::class . '@show');
 $router->get('/projects/(\d+)/edit', ProjectController::class . '@edit');
 $router->post('/projects/(\d+)/edit', ProjectController::class . '@update');
+$router->post('/projects/(\d+)/update-teams', ProjectController::class . '@updateTeams');
 $router->get('/projects/(\d+)/delete', ProjectController::class . '@delete');
 
 // =====================
@@ -92,6 +95,7 @@ $router->post('/tasks/(\d+)/edit', TaskController::class . '@update');
 $router->get('/tasks/(\d+)/delete', TaskController::class . '@delete');
 $router->post('/tasks/add-comment', TaskController::class . '@addComment');
 $router->post('/tasks/upload-attachment', TaskController::class . '@uploadAttachment');
+$router->post('/tasks/(\d+)/update-members', TaskController::class . '@updateMembers');
 
 // =====================
 // DEFAULT ROUTE
@@ -99,6 +103,29 @@ $router->post('/tasks/upload-attachment', TaskController::class . '@uploadAttach
 $router->get('/', function() {
     header('Location: /du_an_xuong/public/dashboard');
 });
+
+// =====================
+// CONTACT PAGE
+// =====================
+$router->get('/contact', ContactController::class . '@index');
+$router->post('/contact', ContactController::class . '@send');
+$router->post('/contact/send', ContactController::class . '@send');
+
+// =====================
+// PRODUCT/INVENTORY MANAGEMENT (Admin only)
+// =====================
+$router->get('/products', ProductController::class . '@index');
+$router->get('/products/create', ProductController::class . '@create');
+$router->post('/products/create', ProductController::class . '@store');
+$router->get('/products/(\d+)/edit', ProductController::class . '@edit');
+$router->post('/products/(\d+)/edit', ProductController::class . '@update');
+$router->get('/products/(\d+)/delete', ProductController::class . '@delete');
+
+// =====================
+// PRODUCT/SHOP ROUTES (For Customers)
+// =====================
+$router->get('/shop', ProductController::class . '@shop');
+$router->get('/shop/(\d+)', ProductController::class . '@details');
 
 // =====================
 // ERROR HANDLING

@@ -5,6 +5,7 @@
         <a href="<?php echo $baseUrl; ?>/projects">📌 Dự án của tôi</a>
         <a href="<?php echo $baseUrl; ?>/tasks">✓ Tác vụ của tôi</a>
         <a href="<?php echo $baseUrl; ?>/teams">👨‍💼 Đội nhóm</a>
+        <a href="<?php echo $baseUrl; ?>/contact">📧 Liên hệ</a>
         <a href="<?php echo $baseUrl; ?>/profile">⚙️ Hồ sơ của tôi</a>
     </div>
     

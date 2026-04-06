@@ -152,4 +152,48 @@ class Task extends Model
         
         return $this->db->fetchAll($sql, $params);
     }
+
+    // ==================== TASK MEMBER ASSIGNMENT ====================
+    
+    public function getAssignedMembers($taskId)
+    {
+        $sql = "SELECT u.* 
+                FROM users u
+                INNER JOIN task_members tm ON u.id = tm.user_id
+                WHERE tm.task_id = ?
+                ORDER BY u.full_name ASC";
+        return $this->db->fetchAll($sql, [$taskId]);
+    }
+
+    public function assignMembers($taskId, $userIds = [])
+    {
+        // Clear existing assignments
+        $deleteSql = "DELETE FROM task_members WHERE task_id = ?";
+        $this->db->execute($deleteSql, [$taskId]);
+        
+        // Add new assignments
+        if (!empty($userIds) && is_array($userIds)) {
+            $userIds = array_filter($userIds); // Remove empty values
+            
+            foreach ($userIds as $userId) {
+                $insertSql = "INSERT INTO task_members (task_id, user_id) VALUES (?, ?)";
+                $this->db->execute($insertSql, [$taskId, $userId]);
+            }
+        }
+        
+        return true;
+    }
+
+    public function isMemberAssigned($taskId, $userId)
+    {
+        $sql = "SELECT id FROM task_members WHERE task_id = ? AND user_id = ?";
+        $result = $this->db->fetchOne($sql, [$taskId, $userId]);
+        return !empty($result);
+    }
+
+    public function unassignMember($taskId, $userId)
+    {
+        $sql = "DELETE FROM task_members WHERE task_id = ? AND user_id = ?";
+        return $this->db->execute($sql, [$taskId, $userId]);
+    }
 }

@@ -80,6 +80,74 @@
             <?php endif; ?>
         </div>
         
+        <!-- TASK ASSIGNMENT SECTION -->
+        <?php if ($isAdmin && !empty($tasks)): ?>
+        <div class="card" style="background: #fef9e7; border: 2px solid #f39c12;">
+            <h2 style="color: #d68910; margin-top: 0;">📋 Phân Công Tác Vụ Cho Thành Viên</h2>
+            
+            <p style="color: #666; margin-bottom: 20px;">
+                Chọn tác vụ từ các dự án được gán cho đội này, rồi phân công cho thành viên.
+            </p>
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
+                <div style="background: white; padding: 15px; border-radius: 5px;">
+                    <h4 style="color: #333; margin-top: 0;">📌 Danh Sách Tác Vụ</h4>
+                    <?php if (!empty($tasks)): ?>
+                        <div style="max-height: 300px; overflow-y: auto; border: 1px solid #ecf0f1; border-radius: 4px;">
+                            <?php foreach ($tasks as $task): ?>
+                                <div style="padding: 10px; border-bottom: 1px solid #ecf0f1; cursor: pointer;" class="task-item" data-task-id="<?php echo $task['id']; ?>" onclick="selectTask(<?php echo $task['id']; ?>, '<?php echo htmlspecialchars(addslashes($task['title'])); ?>')">
+                                    <strong><?php echo htmlspecialchars($task['title']); ?></strong>
+                                    <br>
+                                    <small style="color: #7f8c8d;">Dự án: <?php echo htmlspecialchars($task['project_name']); ?></small>
+                                    <br>
+                                    <small style="color: #95a5a6;">
+                                        Trạng thái: 
+                                        <span style="background: <?php echo $task['status'] == 'todo' ? '#95a5a6' : ($task['status'] == 'in_progress' ? '#f39c12' : '#27ae60'); ?>; color: white; padding: 2px 6px; border-radius: 3px; font-size: 11px;">
+                                            <?php echo ucfirst($task['status']); ?>
+                                        </span>
+                                    </small>
+                                </div>
+                            <?php endforeach; ?>
+                        </div>
+                    <?php else: ?>
+                        <p style="color: #e74c3c;">⚠️ Không có tác vụ nào cho đội này. Vui lòng gán dự án trước.</p>
+                    <?php endif; ?>
+                </div>
+                
+                <div style="background: white; padding: 15px; border-radius: 5px;">
+                    <h4 style="color: #333; margin-top: 0;">👥 Chọn Thành Viên</h4>
+                    <form method="POST" id="assignTaskForm" onsubmit="return updateTaskAction()">
+                        <input type="hidden" name="task_id" id="selectedTaskId" value="">
+                        
+                        <div style="max-height: 300px; overflow-y: auto; border: 1px solid #ecf0f1; border-radius: 4px;">
+                            <?php if (!empty($members)): ?>
+                                <?php foreach ($members as $member): ?>
+                                    <label style="display: flex; align-items: center; gap: 10px; padding: 10px; cursor: pointer; border-bottom: 1px solid #ecf0f1;">
+                                        <input type="checkbox" name="member_ids[]" value="<?php echo $member['id']; ?>" style="width: 18px; height: 18px; cursor: pointer;">
+                                        <span style="flex: 1;">
+                                            <strong><?php echo htmlspecialchars($member['full_name']); ?></strong>
+                                            <br>
+                                            <small style="color: #7f8c8d;">📧 <?php echo htmlspecialchars($member['email']); ?></small>
+                                        </span>
+                                    </label>
+                                <?php endforeach; ?>
+                            <?php else: ?>
+                                <p style="color: #e74c3c;">⚠️ Đội này chưa có thành viên nào.</p>
+                            <?php endif; ?>
+                        </div>
+                        
+                        <div style="margin-top: 15px;">
+                            <button type="submit" id="assignBtn" class="btn btn-success" style="width: 100%; padding: 10px; font-size: 14px; display: none;">
+                                ✓ Phân Công Tác Vụ
+                            </button>
+                            <p id="selectTaskMsg" style="color: #e67e22; margin: 0; font-size: 12px;">Chọn tác vụ từ bên trái trước</p>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <?php endif; ?>
+        
         <!-- Add Member Modal -->
         <div id="addMemberModal" style="display: none; margin-top: 20px;">
             <div class="card" style="background: #f8f9fa; border: 2px solid #3498db;">
@@ -147,5 +215,52 @@ document.addEventListener('click', function(event) {
     if (event.target === modal) {
         closeAddMemberForm();
     }
+});
+
+// Task Assignment Functions
+function selectTask(taskId, taskTitle) {
+    // Set hidden input value
+    document.getElementById('selectedTaskId').value = taskId;
+    
+    // Highlight selected task
+    document.querySelectorAll('.task-item').forEach(item => {
+        item.style.background = '';
+    });
+    document.querySelector(`.task-item[data-task-id="${taskId}"]`).style.background = '#fff3cd';
+    
+    // Show assign button and hide message
+    document.getElementById('assignBtn').style.display = 'block';
+    document.getElementById('selectTaskMsg').style.display = 'none';
+    
+    // Uncheck all members first (optional)
+    document.querySelectorAll('input[name="member_ids[]"]').forEach(checkbox => {
+        checkbox.checked = false;
+    });
+}
+
+function updateTaskAction() {
+    const taskId = document.getElementById('selectedTaskId').value;
+    const checkedMembers = document.querySelectorAll('input[name="member_ids[]"]:checked');
+    
+    if (!taskId) {
+        alert('Vui lòng chọn tác vụ');
+        return false;
+    }
+    
+    if (checkedMembers.length === 0) {
+        alert('Vui lòng chọn ít nhất một thành viên');
+        return false;
+    }
+    
+    // Set form action dynamically
+    const baseUrl = '<?php echo $baseUrl; ?>';
+    document.getElementById('assignTaskForm').action = baseUrl + '/tasks/' + taskId + '/update-members';
+    
+    return true;
+}
+
+// Validate form before submit (optional - already done in updateTaskAction)
+document.getElementById('assignTaskForm').addEventListener('submit', function(e) {
+    return updateTaskAction();
 });
 </script>

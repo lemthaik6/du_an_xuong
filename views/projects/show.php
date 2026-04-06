@@ -55,6 +55,65 @@
         </div>
     </div>
     
+    <!-- SECTION: Teams Management -->
+    <?php if (isset($isAdmin) && $isAdmin): ?>
+    <div class="card" style="margin-bottom: 20px; background: #f0f8ff; border: 2px solid #3498db;">
+        <h3 style="margin-top: 0; color: #2980b9;">👥 Phân Công Đội Nhóm Quản Lý Dự Án</h3>
+        
+        <?php if (!empty($assignedTeams)): ?>
+            <div style="margin-bottom: 16px;">
+                <p style="margin: 0 0 12px 0; color: #333; font-weight: bold;">Đội nhóm hiện quản lý:</p>
+                <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+                    <?php foreach ($assignedTeams as $team): ?>
+                        <span style="background: #27ae60; color: white; padding: 8px 12px; border-radius: 20px; font-size: 14px;">
+                            ✓ <?php echo htmlspecialchars($team['name']); ?>
+                        </span>
+                    <?php endforeach; ?>
+                </div>
+            </div>
+        <?php endif; ?>
+        
+        <form method="POST" action="<?php echo $baseUrl; ?>/projects/<?php echo $project['id']; ?>/update-teams" style="background: white; padding: 16px; border-radius: 8px;">
+            <p style="margin-top: 0; color: #555; font-size: 14px;">Tích chọn các đội nhóm để phân công quản lý dự án:</p>
+            
+            <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px; margin-bottom: 16px;">
+                <?php if (!empty($allTeams)): ?>
+                    <?php foreach ($allTeams as $team): ?>
+                        <?php 
+                            $isChecked = false;
+                            foreach ($assignedTeams as $assigned) {
+                                if ($assigned['id'] == $team['id']) {
+                                    $isChecked = true;
+                                    break;
+                                }
+                            }
+                        ?>
+                        <div style="display: flex; align-items: center; padding: 8px; background: #f9f9f9; border-radius: 5px; border: 1px solid #ddd;">
+                            <input 
+                                type="checkbox" 
+                                name="team_ids[]" 
+                                value="<?php echo $team['id']; ?>"
+                                id="team_<?php echo $team['id']; ?>"
+                                <?php echo $isChecked ? 'checked' : ''; ?>
+                                style="margin-right: 8px; cursor: pointer; width: 18px; height: 18px;"
+                            >
+                            <label for="team_<?php echo $team['id']; ?>" style="cursor: pointer; margin: 0; flex: 1; font-weight: 500;">
+                                <?php echo htmlspecialchars($team['name']); ?>
+                            </label>
+                        </div>
+                    <?php endforeach; ?>
+                <?php else: ?>
+                    <p style="color: #999;">Chưa có đội nhóm nào trong hệ thống</p>
+                <?php endif; ?>
+            </div>
+            
+            <button type="submit" style="background: #2980b9; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; font-weight: bold;">
+                💾 Cập Nhật Phân Công
+            </button>
+        </form>
+    </div>
+    <?php endif; ?>
+    
     <div class="card">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
             <h3 style="margin: 0;">✓ Tác Vụ Trong Dự Án</h3>
@@ -63,7 +122,7 @@
         <?php if (!empty($tasks)): ?>
             <div style="display: grid; gap: 12px;">
                 <?php foreach ($tasks as $task): ?>
-                    <div style="padding: 12px; border: 1px solid #ecf0f1; border-radius: 4px; cursor: pointer; transition: all 0.2s; hover: background #f8f9fa;">
+                    <div style="padding: 12px; border: 1px solid #ecf0f1; border-radius: 4px; cursor: pointer; transition: all 0.2s;">
                         <a href="<?php echo $baseUrl; ?>/tasks/<?php echo $task['id']; ?>" style="text-decoration: none; color: inherit;">
                             <div style="display: flex; justify-content: space-between; align-items: start; gap: 12px;">
                                 <div style="flex: 1;">

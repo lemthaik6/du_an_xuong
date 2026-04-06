@@ -4,27 +4,34 @@ namespace App\Controllers;
 
 use App\Models\Team;
 use App\Models\User;
+use App\Models\Task;
 
 class TeamController extends Controller
 {
     private $teamModel;
     private $userModel;
+    private $taskModel;
 
     public function __construct()
     {
         parent::__construct();
         $this->teamModel = new Team();
         $this->userModel = new User();
+        $this->taskModel = new Task();
         $this->auth->requireLogin();
-        $this->auth->requireAdmin();
     }
 
     public function index()
     {
-        $teams = $this->teamModel->all();
+        if ($this->auth->isAdmin()) {
+            $teams = $this->teamModel->all();
+        } else {
+            $teams = $this->teamModel->getTeamsWithMembershipStatus($this->auth->getId());
+        }
         
         echo $this->render('teams/index', [
-            'teams' => $teams
+            'teams' => $teams,
+            'isAdmin' => $this->auth->isAdmin()
         ]);
     }
 
@@ -37,21 +44,30 @@ class TeamController extends Controller
         $team = $this->teamModel->getTeam($id);
         $members = $this->teamModel->getTeamMembers($id);
         $allUsers = $this->userModel->all();
+        $tasks = $this->teamModel->getTasksForTeam($id);
         
         if (!$team) {
             $this->setFlash('error', 'Đội không tồn tại');
             $this->redirect('/du_an_xuong/public/teams');
         }
 
+        // Ensure $tasks is array
+        if (!is_array($tasks)) {
+            $tasks = [];
+        }
+
         echo $this->render('teams/show', [
             'team' => $team,
             'members' => $members,
-            'available_users' => $allUsers
+            'available_users' => $allUsers,
+            'tasks' => $tasks,
+            'isAdmin' => $this->auth->isAdmin()
         ]);
     }
 
     public function create()
     {
+        $this->auth->requireAdmin();
         $users = $this->userModel->all();
         
         echo $this->render('teams/form', [
@@ -61,6 +77,7 @@ class TeamController extends Controller
 
     public function store()
     {
+        $this->auth->requireAdmin();
         $post = $this->getPost();
         
         $errors = $this->validate($post, [
@@ -87,6 +104,7 @@ class TeamController extends Controller
 
     public function edit($id)
     {
+        $this->auth->requireAdmin();
         if (empty($id)) {
             $this->redirect('/du_an_xuong/public/teams');
         }
@@ -107,6 +125,7 @@ class TeamController extends Controller
 
     public function update($id)
     {
+        $this->auth->requireAdmin();
         if (empty($id)) {
             $this->redirect('/du_an_xuong/public/teams');
         }
@@ -126,6 +145,7 @@ class TeamController extends Controller
 
     public function addMember()
     {
+        $this->auth->requireAdmin();
         if (empty($_POST['team_id']) || empty($_POST['user_id'])) {
             $this->setFlash('error', 'Vui lòng chọn đội và người dùng');
             return;
@@ -143,6 +163,7 @@ class TeamController extends Controller
 
     public function removeMember($team_id, $user_id)
     {
+        $this->auth->requireAdmin();
         if (empty($team_id) || empty($user_id)) {
             $this->redirect('/du_an_xuong/public/teams');
         }

@@ -4,6 +4,7 @@ namespace App\Controllers;
 
 use App\Models\Task;
 use App\Models\Project;
+use App\Models\Team;
 use App\Models\User;
 use App\Models\Comment;
 use App\Models\Attachment;
@@ -12,6 +13,7 @@ class TaskController extends Controller
 {
     private $taskModel;
     private $projectModel;
+    private $teamModel;
     private $userModel;
     private $commentModel;
     private $attachmentModel;
@@ -21,6 +23,7 @@ class TaskController extends Controller
         parent::__construct();
         $this->taskModel = new Task();
         $this->projectModel = new Project();
+        $this->teamModel = new Team();
         $this->userModel = new User();
         $this->commentModel = new Comment();
         $this->attachmentModel = new Attachment();
@@ -87,12 +90,41 @@ class TaskController extends Controller
 
         $comments = $this->commentModel->getByTask($id);
         $attachments = $this->attachmentModel->getByTask($id);
+        
+        // Get assigned members and all available team members
+        $assignedMembers = $this->taskModel->getAssignedMembers($id);
+        $allTeamMembers = [];
+        $isAdmin = $this->auth->isAdmin();
+        
+        // Get all team members from the project's assigned teams
+        if (!empty($task['project_id'])) {
+            $project = $this->projectModel->find($task['project_id']);
+            if ($project) {
+                $assignedTeams = $this->projectModel->getAssignedTeams($task['project_id']);
+                $memberIds = [];
+                
+                if (!empty($assignedTeams)) {
+                    foreach ($assignedTeams as $team) {
+                        $teamMembers = $this->teamModel->getTeamMembers($team['id']);
+                        if (is_array($teamMembers)) {
+                            foreach ($teamMembers as $member) {
+                                $memberIds[$member['id']] = $member;
+                            }
+                        }
+                    }
+                }
+                
+                $allTeamMembers = array_values($memberIds);
+            }
+        }
 
         echo $this->render('tasks/show', [
             'task' => $task,
             'comments' => $comments,
             'attachments' => $attachments,
-            'isAdmin' => $this->auth->isAdmin()
+            'isAdmin' => $isAdmin,
+            'assignedMembers' => $assignedMembers,
+            'allTeamMembers' => $allTeamMembers
         ]);
     }
 
@@ -112,7 +144,12 @@ class TaskController extends Controller
         }
 
         $projects = $this->projectModel->all();
-        $users = $this->userModel->all();
+        
+        // Get team members from the project's assigned team
+        $users = [];
+        if (!empty($project['team_id'])) {
+            $users = $this->teamModel->getTeamMembers($project['team_id']);
+        }
         
         // Provide empty arrays if null
         if (!is_array($projects)) {
@@ -179,7 +216,13 @@ class TaskController extends Controller
         }
 
         $projects = $this->projectModel->all();
-        $users = $this->userModel->all();
+        
+        // Get team members from the task's project's assigned team
+        $project = $this->projectModel->find($task['project_id']);
+        $users = [];
+        if (!empty($project['team_id'])) {
+            $users = $this->teamModel->getTeamMembers($project['team_id']);
+        }
         
         // Provide empty arrays if null
         if (!is_array($projects)) {
@@ -295,5 +338,51 @@ class TaskController extends Controller
         }
 
         $this->redirect('/du_an_xuong/public/tasks/' . $task_id);
+    }
+
+    // ==================== TASK MEMBER ASSIGNMENT ====================
+    
+    public function updateMembers()
+    {
+        $this->auth->requireLogin();
+        
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            $this->redirect('/du_an_xuong/public/tasks');
+        }
+
+        $post = $this->getPost();
+        
+        if (empty($post['task_id'])) {
+            $this->setFlash('error', 'Tác vụ không tồn tại');
+            $this->redirect('/du_an_xuong/public/tasks');
+        }
+
+        $taskId = $post['task_id'];
+        $task = $this->taskModel->getTask($taskId);
+        
+        if (!$task) {
+            $this->setFlash('error', 'Tác vụ không tồn tại');
+            $this->redirect('/du_an_xuong/public/tasks');
+        }
+
+        // Only admin and project creator can assign members
+        if (!$this->auth->isAdmin() && $task['created_by'] != $this->auth->getId()) {
+            $this->setFlash('error', 'Bạn không có quyền cập nhật phân công');
+            $this->redirect('/du_an_xuong/public/tasks/' . $taskId);
+        }
+
+        // Get member IDs from checkbox
+        $memberIds = isset($post['member_ids']) && is_array($post['member_ids']) ? $post['member_ids'] : [];
+        
+        // Validate that all memberIds are valid integers
+        $memberIds = array_filter($memberIds, function($id) {
+            return !empty($id) && is_numeric($id);
+        });
+
+        // Assign members to task
+        $this->taskModel->assignMembers($taskId, $memberIds);
+
+        $this->setFlash('success', 'Cập nhật phân công tác vụ thành công');
+        $this->redirect('/du_an_xuong/public/tasks/' . $taskId);
     }
 }

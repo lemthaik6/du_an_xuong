@@ -1,4 +1,5 @@
 <div style="display: flex; gap: 20px;">
+    <?php if ($isAdmin): ?>
     <div class="sidebar-menu">
         <h3>Menu</h3>
         <a href="<?php echo $baseUrl; ?>/dashboard">📊 Dashboard</a>
@@ -9,15 +10,20 @@
         <a href="<?php echo $baseUrl; ?>/teams">👨‍💼 Quản lý Đội nhóm</a>
         <a href="<?php echo $baseUrl; ?>/profile">⚙️ Hồ sơ của tôi</a>
     </div>
+    <?php endif; ?>
     
-    <div class="main-content">
+    <div class="main-content" style="<?php echo !$isAdmin ? 'max-width: 1000px; margin: 0 auto;' : ''; ?>">
         <div class="card" style="margin-bottom: 10px;">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
                 <div>
                     <h2 style="margin: 0;">👨‍💼 Danh Sách Đội Nhóm</h2>
-                    <p style="color: #666; margin: 5px 0;">Quản lý các đội nhóm của dự án</p>
+                    <p style="color: #666; margin: 5px 0;"><?php echo $isAdmin ? 'Quản lý các đội nhóm của dự án' : 'Các đội nhóm có sẵn'; ?></p>
                 </div>
+                <?php if ($isAdmin): ?>
                 <a href="<?php echo $baseUrl; ?>/teams/create" class="btn btn-success" style="padding: 12px 20px;">+ Tạo Đội Nhóm</a>
+                <?php else: ?>
+                <a href="<?php echo $baseUrl; ?>/dashboard" class="btn btn-primary">← Quay Lại Dashboard</a>
+                <?php endif; ?>
             </div>
         </div>
         
@@ -30,7 +36,11 @@
                             <th>Lãnh Đạo</th>
                             <th>Số Thành Viên</th>
                             <th>Trạng Thái</th>
+                            <?php if ($isAdmin): ?>
                             <th style="text-align: center;">Hành Động</th>
+                            <?php else: ?>
+                            <th>Tham Gia</th>
+                            <?php endif; ?>
                         </tr>
                     </thead>
                     <tbody>
@@ -66,6 +76,7 @@
                                         </span>
                                     <?php endif; ?>
                                 </td>
+                                <?php if ($isAdmin): ?>
                                 <td style="text-align: center;">
                                     <div style="display: flex; gap: 5px; justify-content: center;">
                                         <a href="<?php echo $baseUrl; ?>/teams/<?php echo $team['id']; ?>" class="btn btn-primary" style="font-size: 12px; padding: 6px 12px;">👁️ Xem</a>
@@ -73,6 +84,17 @@
                                         <a href="<?php echo $baseUrl; ?>/teams/<?php echo $team['id']; ?>/delete" class="btn btn-danger" style="font-size: 12px; padding: 6px 12px;" onclick="return confirm('Xóa đội nhóm này? Hành động này không thể hoàn tác.')">🗑️ Xóa</a>
                                     </div>
                                 </td>
+                                <?php else: ?>
+                                <td>
+                                    <?php if ($team['is_member'] ?? false): ?>
+                                        <span style="background: #27ae60; color: white; padding: 6px 12px; border-radius: 4px; font-weight: bold;">
+                                            ✓ Đã tham gia
+                                        </span>
+                                    <?php else: ?>
+                                        <a href="<?php echo $baseUrl; ?>/teams/<?php echo $team['id']; ?>" class="btn btn-primary" style="font-size: 12px; padding: 6px 12px;">Xem chi tiết</a>
+                                    <?php endif; ?>
+                                </td>
+                                <?php endif; ?>
                             </tr>
                         <?php endforeach; ?>
                     </tbody>
@@ -82,7 +104,9 @@
             <div class="card" style="background: #f8f9fa; text-align: center; padding: 40px;">
                 <h3 style="color: #666;">Chưa có đội nhóm nào</h3>
                 <p style="color: #999;">Tạo đội nhóm đầu tiên để bắt đầu quản lý dự án</p>
+                <?php if ($isAdmin): ?>
                 <a href="<?php echo $baseUrl; ?>/teams/create" class="btn btn-success" style="padding: 12px 20px; display: inline-block; margin-top: 10px;">+ Tạo Đội Nhóm Đầu Tiên</a>
+                <?php endif; ?>
             </div>
         <?php endif; ?>
     </div>

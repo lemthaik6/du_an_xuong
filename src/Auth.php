@@ -74,13 +74,14 @@ class Auth
             }
 
             // Insert user
+            $role = in_array($data['role'] ?? 'user', ['user', 'customer', 'admin']) ? $data['role'] : 'user';
             $userId = $this->db->insert('users', [
                 'username' => $data['email'],
                 'email' => $data['email'],
                 'password' => md5($data['password']),
                 'full_name' => $data['full_name'],
                 'phone' => $data['phone'] ?? null,
-                'role' => 'user',
+                'role' => $role,
                 'status' => 'active'
             ]);
 
@@ -105,6 +106,11 @@ class Auth
     public function isAdmin()
     {
         return isset($_SESSION['role']) && $_SESSION['role'] === 'admin';
+    }
+
+    public function isCustomer()
+    {
+        return isset($_SESSION['role']) && $_SESSION['role'] === 'customer';
     }
 
     public function getId()

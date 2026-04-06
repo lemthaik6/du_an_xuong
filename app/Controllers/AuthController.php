@@ -14,6 +14,34 @@ class AuthController extends Controller
         $this->userModel = new User();
     }
 
+    protected function renderAuth($view, $data = [])
+    {
+        extract($data);
+        $baseUrl = defined('APP_BASE_URL') ? APP_BASE_URL : '/du_an_xuong/public';
+        
+        $file = $this->viewPath . $view . '.php';
+        
+        if (!file_exists($file)) {
+            die("View not found: {$file}");
+        }
+
+        ob_start();
+        include $file;
+        $content = ob_get_clean();
+        
+        // Get flash messages if any
+        $flash = isset($_SESSION['flash']) ? $_SESSION['flash'] : null;
+        if (isset($_SESSION['flash'])) {
+            unset($_SESSION['flash']);
+        }
+        
+        ob_start();
+        include $this->viewPath . 'layouts/auth-layout.php';
+        $html = ob_get_clean();
+        
+        return $html;
+    }
+
     public function loginPage()
     {
         if ($this->auth->isLoggedIn()) {
@@ -21,7 +49,7 @@ class AuthController extends Controller
         }
         
         $flash = $this->getFlash();
-        echo $this->render('auth/login', ['flash' => $flash]);
+        echo $this->renderAuth('auth/login', ['flash' => $flash]);
     }
 
     public function register()
@@ -31,7 +59,7 @@ class AuthController extends Controller
         }
         
         $flash = $this->getFlash();
-        echo $this->render('auth/register', ['flash' => $flash]);
+        echo $this->renderAuth('auth/register', ['flash' => $flash]);
     }
 
     public function handleLogin()
