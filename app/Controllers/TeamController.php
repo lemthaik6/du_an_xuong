@@ -24,7 +24,7 @@ class TeamController extends Controller
     public function index()
     {
         if ($this->auth->isAdmin()) {
-            $teams = $this->teamModel->all();
+            $teams = $this->teamModel->getAllTeamsForAdmin();
         } else {
             $teams = $this->teamModel->getTeamsWithMembershipStatus($this->auth->getId());
         }

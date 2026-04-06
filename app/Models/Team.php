@@ -28,6 +28,16 @@ class Team extends Model
         return $this->db->fetchAll($sql);
     }
 
+    public function getAllTeamsForAdmin()
+    {
+        $sql = "SELECT t.*, u.full_name as leader_name,
+                (SELECT COUNT(*) FROM team_members WHERE team_id = t.id) as member_count
+                FROM {$this->table} t
+                LEFT JOIN users u ON t.leader_id = u.id
+                ORDER BY t.name ASC";
+        return $this->db->fetchAll($sql);
+    }
+
     public function getAllTeams($page = 1, $limit = 10)
     {
         $offset = ($page - 1) * $limit;
@@ -42,11 +52,14 @@ class Team extends Model
 
     public function getTeamMembers($teamId)
     {
-        $sql = "SELECT u.*, tm.id as team_member_id, tm.position, tm.joined_at FROM users u
+        $sql = "SELECT u.id, u.username, u.email, u.full_name, u.phone, u.role, u.status,
+                tm.id as team_member_id, tm.position, tm.joined_at 
+                FROM users u
                 INNER JOIN team_members tm ON u.id = tm.user_id
                 WHERE tm.team_id = ?
                 ORDER BY u.full_name ASC";
-        return $this->db->fetchAll($sql, [$teamId]);
+        $result = $this->db->fetchAll($sql, [$teamId]);
+        return is_array($result) ? $result : [];
     }
 
     public function addMember($teamId, $userId, $position = null)

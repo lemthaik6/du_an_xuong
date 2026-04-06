@@ -13,7 +13,10 @@
     <div class="main-content">
         <div class="card">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                <h2 style="margin: 0;"><?php echo htmlspecialchars($team['name']); ?></h2>
+                <div>
+                    <h2 style="margin: 0;"><?php echo htmlspecialchars($team['name']); ?></h2>
+                    <p style="color: #7f8c8d; margin: 5px 0;">Quản lý thông tin và thành viên đội nhóm</p>
+                </div>
                 <div style="display: flex; gap: 10px;">
                     <a href="<?php echo $baseUrl; ?>/teams/<?php echo $team['id']; ?>/edit" class="btn btn-warning">Sửa</a>
                     <a href="<?php echo $baseUrl; ?>/teams" class="btn btn-primary">← Quay Lại</a>
@@ -31,7 +34,11 @@
                             <?php echo $team['status'] == 'active' ? 'Hoạt động' : 'Vô hiệu'; ?>
                         </span>
                     </p>
-                    <p><strong>Số Thành Viên:</strong> <?php echo count($members); ?></p>
+                    <p><strong>Số Thành Viên:</strong> 
+                        <span style="background: #3498db; color: white; padding: 4px 8px; border-radius: 4px; font-weight: bold;">
+                            <?php echo !empty($members) ? count($members) : ($team['member_count'] ?? 0); ?>
+                        </span>
+                    </p>
                 </div>
             </div>
         </div>
@@ -42,7 +49,7 @@
                 <button onclick="openAddMemberForm('<?php echo $team['id']; ?>')" class="btn btn-success" style="cursor: pointer;">+ Thêm Thành Viên</button>
             </div>
             
-            <?php if (!empty($members)): ?>
+            <?php if (!empty($members) && is_array($members)): ?>
                 <table>
                     <thead>
                         <tr>
@@ -56,8 +63,8 @@
                     <tbody>
                         <?php foreach ($members as $member): ?>
                             <tr>
-                                <td><?php echo htmlspecialchars($member['full_name']); ?></td>
-                                <td><?php echo htmlspecialchars($member['email']); ?></td>
+                                <td><?php echo htmlspecialchars($member['full_name'] ?? $member['username'] ?? 'N/A'); ?></td>
+                                <td><?php echo htmlspecialchars($member['email'] ?? 'N/A'); ?></td>
                                 <td>
                                     <?php if (!empty($member['position'])): ?>
                                         <span style="background: #ecf0f1; padding: 4px 8px; border-radius: 4px;">
@@ -67,16 +74,35 @@
                                         <span style="color: #999;">Chưa cập nhật</span>
                                     <?php endif; ?>
                                 </td>
-                                <td><?php echo $member['joined_at'] ? date('d/m/Y', strtotime($member['joined_at'])) : 'N/A'; ?></td>
                                 <td>
-                                    <a href="<?php echo $baseUrl; ?>/teams/<?php echo $team['id']; ?>/remove-member/<?php echo $member['id']; ?>" class="btn btn-danger" style="font-size: 12px; padding: 6px 12px;" onclick="return confirm('Xóa thành viên này khỏi đội?')">Xóa</a>
+                                    <?php 
+                                    if (!empty($member['joined_at'])) {
+                                        echo date('d/m/Y', strtotime($member['joined_at']));
+                                    } else {
+                                        echo 'N/A';
+                                    }
+                                    ?>
+                                </td>
+                                <td>
+                                    <a href="<?php echo $baseUrl; ?>/teams/<?php echo $team['id']; ?>/remove-member/<?php echo htmlspecialchars($member['id'] ?? $member['user_id'] ?? ''); ?>" class="btn btn-danger" style="font-size: 12px; padding: 6px 12px;" onclick="return confirm('Xóa thành viên này khỏi đội?')">Xóa</a>
                                 </td>
                             </tr>
                         <?php endforeach; ?>
                     </tbody>
                 </table>
             <?php else: ?>
-                <p style="color: #999; font-style: italic;">Chưa có thành viên nào trong đội. <a href="#" onclick="openAddMemberForm('<?php echo $team['id']; ?>'); return false;">Thêm thành viên đầu tiên</a></p>
+                <div style="background: #f8f9fa; padding: 30px; text-align: center; border-radius: 8px;">
+                    <p style="color: #999; font-style: italic; margin: 0 0 15px 0;">
+                        <?php 
+                        if ($team['member_count'] > 0) {
+                            echo '⚠️ Không thể hiển thị thành viên - có ' . $team['member_count'] . ' thành viên được ghi nhận nhưng không thể tải dữ liệu.';
+                        } else {
+                            echo '📭 Chưa có thành viên nào trong đội.';
+                        }
+                        ?>
+                    </p>
+                    <a href="#" onclick="openAddMemberForm('<?php echo $team['id']; ?>'); return false;" class="btn btn-success">+ Thêm thành viên đầu tiên</a>
+                </div>
             <?php endif; ?>
         </div>
         
@@ -120,14 +146,14 @@
                         <input type="hidden" name="task_id" id="selectedTaskId" value="">
                         
                         <div style="max-height: 300px; overflow-y: auto; border: 1px solid #ecf0f1; border-radius: 4px;">
-                            <?php if (!empty($members)): ?>
+                            <?php if (!empty($members) && is_array($members)): ?>
                                 <?php foreach ($members as $member): ?>
                                     <label style="display: flex; align-items: center; gap: 10px; padding: 10px; cursor: pointer; border-bottom: 1px solid #ecf0f1;">
-                                        <input type="checkbox" name="member_ids[]" value="<?php echo $member['id']; ?>" style="width: 18px; height: 18px; cursor: pointer;">
+                                        <input type="checkbox" name="member_ids[]" value="<?php echo $member['id'] ?? $member['user_id'] ?? ''; ?>" style="width: 18px; height: 18px; cursor: pointer;">
                                         <span style="flex: 1;">
-                                            <strong><?php echo htmlspecialchars($member['full_name']); ?></strong>
+                                            <strong><?php echo htmlspecialchars($member['full_name'] ?? $member['username'] ?? 'N/A'); ?></strong>
                                             <br>
-                                            <small style="color: #7f8c8d;">📧 <?php echo htmlspecialchars($member['email']); ?></small>
+                                            <small style="color: #7f8c8d;">📧 <?php echo htmlspecialchars($member['email'] ?? 'N/A'); ?></small>
                                         </span>
                                     </label>
                                 <?php endforeach; ?>
