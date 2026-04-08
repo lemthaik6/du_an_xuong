@@ -110,11 +110,16 @@ class DashboardController extends Controller
         // Lấy sản phẩm mới nhất
         $products = $this->productModel->getActiveProducts(1, 8);
         $totalProducts = $this->productModel->getTotalActiveProducts();
+        
+        // Get baseUrl
+        $baseUrl = $_ENV['APP_URL'] ?? 'http://localhost/du_an_xuong/public';
+        $baseUrl = rtrim($baseUrl, '/');
 
         echo $this->render('dashboard/customer', [
             'user' => $user,
             'products' => $products,
-            'totalProducts' => $totalProducts
+            'totalProducts' => $totalProducts,
+            'baseUrl' => $baseUrl
         ]);
     }
 

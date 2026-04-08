@@ -21,35 +21,38 @@ if (!isset($_SESSION['user_id'])) {
 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: radial-gradient(circle at top left, rgba(99, 102, 241, 0.18), transparent 30%), linear-gradient(180deg, #f8fafc 0%, #e2e8f0 100%);
             min-height: 100vh;
-            padding: 20px;
+            padding: 24px 16px;
+            color: #1f2937;
         }
 
         .container {
-            max-width: 1200px;
+            max-width: 1180px;
             margin: 0 auto;
         }
 
         .header {
-            background: white;
-            padding: 30px;
-            border-radius: 10px;
-            margin-bottom: 30px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            background: rgba(255, 255, 255, 0.96);
+            padding: 28px 32px;
+            border-radius: 28px;
+            margin-bottom: 28px;
+            box-shadow: 0 24px 60px rgba(15, 23, 42, 0.08);
             display: flex;
             justify-content: space-between;
             align-items: center;
+            border: 1px solid rgba(203, 213, 225, 0.75);
         }
 
         .header h1 {
-            color: #333;
-            font-size: 28px;
-            margin-bottom: 5px;
+            color: #0f172a;
+            font-size: 34px;
+            margin-bottom: 6px;
+            font-weight: 800;
         }
 
         .header p {
-            color: #666;
+            color: #475569;
             font-size: 14px;
         }
 
@@ -58,199 +61,305 @@ if (!isset($_SESSION['user_id'])) {
         }
 
         .user-info p {
-            color: #667eea;
-            font-weight: bold;
-            margin-bottom: 10px;
+            color: #334155;
+            font-weight: 700;
+            margin-bottom: 12px;
+            font-size: 15px;
         }
 
         .logout-btn {
-            background: #f44336;
+            background: #4f46e5;
             color: white;
-            padding: 8px 20px;
+            padding: 10px 22px;
             border: none;
-            border-radius: 5px;
+            border-radius: 999px;
             cursor: pointer;
             text-decoration: none;
             display: inline-block;
             font-size: 14px;
-            transition: background 0.3s;
+            font-weight: 700;
+            transition: all 0.25s ease;
+            margin-left: 10px;
         }
 
         .logout-btn:hover {
-            background: #da190b;
+            transform: translateY(-2px);
+            box-shadow: 0 14px 28px rgba(79, 70, 229, 0.18);
+        }
+
+        .logout-btn[style*="background: #2196F3"] {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%) !important;
+        }
+
+        .logout-btn[style*="background: #f44336"], 
+        .logout-btn[style*="f44336"] {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%) !important;
         }
 
         .nav-links {
             display: flex;
             gap: 15px;
-            margin-bottom: 20px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
         }
 
         .nav-link {
             background: white;
             padding: 12px 24px;
-            border-radius: 5px;
+            border-radius: 999px;
             text-decoration: none;
-            color: #667eea;
-            font-weight: bold;
-            transition: all 0.3s;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            color: #334155;
+            font-weight: 700;
+            transition: all 0.25s ease;
+            box-shadow: 0 12px 28px rgba(15, 23, 42, 0.08);
+            font-size: 14px;
+            border: 1px solid rgba(148, 163, 184, 0.3);
         }
 
         .nav-link:hover {
-            background: #667eea;
+            background: #4f46e5;
             color: white;
             transform: translateY(-2px);
+            box-shadow: 0 16px 32px rgba(79, 70, 229, 0.18);
         }
 
         .welcome-section {
             background: white;
-            padding: 30px;
-            border-radius: 10px;
-            margin-bottom: 30px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 32px;
+            border-radius: 26px;
+            margin-bottom: 36px;
+            box-shadow: 0 20px 50px rgba(15, 23, 42, 0.08);
+            border: 1px solid rgba(148, 163, 184, 0.18);
         }
 
         .welcome-section h2 {
-            color: #333;
-            margin-bottom: 10px;
+            color: #0f172a;
+            margin-bottom: 14px;
+            font-size: 30px;
+            font-weight: 800;
         }
 
         .welcome-section p {
-            color: #666;
-            line-height: 1.6;
-            margin-bottom: 15px;
+            color: #475569;
+            line-height: 1.8;
+            margin-bottom: 22px;
+            font-size: 15px;
         }
 
         .features {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
             gap: 20px;
             margin-top: 20px;
         }
 
         .feature-box {
-            background: #f5f5f5;
-            padding: 20px;
-            border-radius: 8px;
-            border-left: 4px solid #667eea;
+            background: #f8fafc;
+            padding: 22px;
+            border-radius: 22px;
+            border: 1px solid rgba(148, 163, 184, 0.18);
+            transition: all 0.25s ease;
+        }
+
+        .feature-box:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 16px 34px rgba(15, 23, 42, 0.08);
         }
 
         .feature-box h3 {
-            color: #333;
+            color: #111827;
             margin-bottom: 10px;
-            font-size: 16px;
+            font-size: 18px;
+            font-weight: 700;
         }
 
         .feature-box p {
-            color: #666;
+            color: #475569;
             font-size: 14px;
+            line-height: 1.75;
         }
 
         .products-section {
-            background: white;
-            padding: 30px;
-            border-radius: 10px;
-            margin-bottom: 30px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            background: #ffffff;
+            padding: 34px;
+            border-radius: 28px;
+            margin-bottom: 40px;
+            box-shadow: 0 24px 60px rgba(15, 23, 42, 0.08);
+            border: 1px solid rgba(148, 163, 184, 0.18);
         }
 
         .products-section h2 {
-            color: #333;
-            margin-bottom: 20px;
-            font-size: 24px;
+            color: #0f172a;
+            margin-bottom: 30px;
+            font-size: 32px;
+            font-weight: 800;
+            text-align: center;
         }
 
         .products-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-            gap: 20px;
+            grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
+            gap: 25px;
+            padding: 10px 0;
         }
 
         .product-card {
-            border: 1px solid #ddd;
-            border-radius: 8px;
+            background: #f8fbff;
+            border: 1px solid rgba(148, 163, 184, 0.18);
+            border-radius: 28px;
             overflow: hidden;
-            transition: all 0.3s;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            box-shadow: 0 20px 40px rgba(15, 23, 42, 0.06);
         }
 
         .product-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            transform: translateY(-10px);
+            box-shadow: 0 28px 60px rgba(15, 23, 42, 0.12);
         }
 
         .product-image {
             width: 100%;
-            height: 200px;
-            background: #f0f0f0;
+            height: 240px;
+            background: linear-gradient(180deg, #eef2ff 0%, #dbeafe 100%);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 12px;
-            color: #999;
-            font-weight: bold;
+            overflow: hidden;
+            position: relative;
+            border-bottom: 1px solid rgba(148, 163, 184, 0.18);
+        }
+
+        .product-image img {
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .product-card:hover .product-image img {
+            transform: scale(1.05);
         }
 
         .product-content {
-            padding: 15px;
+            padding: 24px;
         }
 
         .product-name {
-            color: #333;
-            font-weight: bold;
-            margin-bottom: 8px;
-            font-size: 16px;
+            color: #0f172a;
+            font-weight: 800;
+            margin-bottom: 10px;
+            font-size: 18px;
+            line-height: 1.4;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
         }
 
         .product-description {
-            color: #666;
-            font-size: 13px;
-            margin-bottom: 10px;
-            line-height: 1.4;
+            color: #475569;
+            font-size: 14px;
+            margin-bottom: 16px;
+            line-height: 1.75;
+            min-height: 48px;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
         }
 
         .product-price {
-            color: #667eea;
-            font-weight: bold;
-            font-size: 18px;
-            margin-bottom: 12px;
+            color: #2563eb;
+            font-weight: 800;
+            font-size: 20px;
+            margin-bottom: 18px;
+        }
+
+        .product-actions {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 12px;
+        }
+
+        .detail-btn,
+        .contact-btn {
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            padding: 12px 18px;
+            border: none;
+            border-radius: 999px;
+            cursor: pointer;
+            font-weight: 700;
+            transition: all 0.25s ease;
+            font-size: 14px;
+            text-decoration: none;
+            min-width: 130px;
+            white-space: nowrap;
+        }
+
+        .detail-btn {
+            background: #3b82f6;
+            box-shadow: 0 12px 25px rgba(59, 130, 246, 0.18);
         }
 
         .contact-btn {
-            background: #4CAF50;
-            color: white;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-weight: bold;
-            width: 100%;
-            transition: background 0.3s;
+            background: #14b8a6;
+            box-shadow: 0 12px 25px rgba(20, 184, 166, 0.18);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .detail-btn:hover {
+            transform: translateY(-2px);
+            background: #2563eb;
         }
 
         .contact-btn:hover {
-            background: #45a049;
+            transform: translateY(-2px);
+            background: #0f766e;
+        }
+
+        .contact-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.2);
+            transition: left 0.3s ease;
+        }
+
+        .contact-btn:hover::before {
+            left: 100%;
         }
 
         .contact-section {
-            background: white;
-            padding: 30px;
-            border-radius: 10px;
-            margin-bottom: 30px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            background: #ffffff;
+            padding: 36px;
+            border-radius: 28px;
+            margin-bottom: 40px;
+            box-shadow: 0 20px 50px rgba(15, 23, 42, 0.08);
+            border: 1px solid rgba(148, 163, 184, 0.18);
         }
 
         .contact-section h2 {
-            color: #333;
-            margin-bottom: 20px;
-            font-size: 24px;
+            color: #0f172a;
+            margin-bottom: 16px;
+            font-size: 30px;
+            font-weight: 800;
+        }
+
+        .contact-section p {
+            color: #475569;
+            margin-bottom: 24px;
+            line-height: 1.75;
+            font-size: 15px;
         }
 
         .contact-form {
             display: grid;
-            gap: 15px;
-            max-width: 600px;
+            gap: 20px;
+            max-width: 700px;
         }
 
         .form-group {
@@ -259,78 +368,133 @@ if (!isset($_SESSION['user_id'])) {
         }
 
         .form-group label {
-            color: #333;
-            font-weight: bold;
-            margin-bottom: 5px;
+            color: #334155;
+            font-weight: 700;
+            margin-bottom: 8px;
+            font-size: 15px;
         }
 
         .form-group input,
         .form-group textarea {
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
+            padding: 14px 18px;
+            border: 1px solid #cbd5e1;
+            border-radius: 16px;
             font-family: inherit;
             font-size: 14px;
+            transition: all 0.25s ease;
+            background: #f8fafc;
         }
 
         .form-group textarea {
             resize: vertical;
-            min-height: 120px;
+            min-height: 140px;
+            font-family: 'Segoe UI', inherit;
         }
 
         .form-group input:focus,
         .form-group textarea:focus {
             outline: none;
-            border-color: #667eea;
-            box-shadow: 0 0 5px rgba(102, 126, 234, 0.3);
+            border-color: #6366f1;
+            background: #ffffff;
+            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.12);
         }
 
         .submit-btn {
-            background: #667eea;
+            background: #22c55e;
             color: white;
-            padding: 12px 30px;
+            padding: 14px 36px;
             border: none;
-            border-radius: 5px;
+            border-radius: 999px;
             cursor: pointer;
-            font-weight: bold;
+            font-weight: 700;
             font-size: 16px;
-            transition: background 0.3s;
+            transition: all 0.25s ease;
+            align-self: flex-start;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 14px 30px rgba(20, 184, 166, 0.18);
         }
 
         .submit-btn:hover {
-            background: #5568d3;
+            transform: translateY(-2px);
+            background: #16a34a;
+            box-shadow: 0 18px 34px rgba(20, 184, 166, 0.24);
+        }
+
+        .submit-btn:hover:before {
+            left: 100%;
         }
 
         .no-products {
             text-align: center;
-            padding: 40px;
-            color: #999;
+            padding: 60px 40px;
+            color: #95a5a6;
+        }
+
+        .no-products h3 {
+            color: #667eea;
+            font-size: 24px;
+            margin-bottom: 10px;
         }
 
         .footer {
             text-align: center;
-            color: white;
-            padding: 20px;
-            margin-top: 30px;
+            color: rgba(255, 255, 255, 0.9);
+            padding: 30px 20px;
+            margin-top: 50px;
+            font-size: 14px;
         }
 
         @media (max-width: 768px) {
             .header {
                 flex-direction: column;
                 text-align: center;
+                padding: 25px;
+            }
+
+            .header h1 {
+                font-size: 24px;
             }
 
             .user-info {
                 text-align: center;
-                margin-top: 15px;
+                margin-top: 20px;
+            }
+
+            .logout-btn {
+                margin-left: 0;
+                margin-top: 8px;
             }
 
             .products-grid {
-                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+                grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+                gap: 15px;
             }
 
             .contact-form {
                 max-width: 100%;
+            }
+
+            .products-section {
+                padding: 20px;
+            }
+
+            .welcome-section {
+                padding: 20px;
+            }
+
+            .contact-section {
+                padding: 25px;
+            }
+
+            .nav-links {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .nav-link {
+                width: 100%;
+                text-align: center;
             }
         }
     </style>
@@ -345,8 +509,8 @@ if (!isset($_SESSION['user_id'])) {
             </div>
             <div class="user-info">
                 <p><?php echo htmlspecialchars($user['full_name'] ?? $user['username'] ?? 'Khách'); ?></p>
-                <a href="/du_an_xuong/public/profile" class="logout-btn" style="background: #2196F3; margin-right: 10px;">Cài Đặt Tài Khoản</a>
-                <a href="/du_an_xuong/public/logout" class="logout-btn">Đăng Xuất</a>
+                <a href="<?php echo $baseUrl; ?>/profile" class="logout-btn" style="background: #2196F3; margin-right: 10px;">Cài Đặt Tài Khoản</a>
+                <a href="<?php echo $baseUrl; ?>/logout" class="logout-btn">Đăng Xuất</a>
             </div>
         </div>
 
@@ -354,7 +518,7 @@ if (!isset($_SESSION['user_id'])) {
         <div class="nav-links">
             <a href="#san-pham" class="nav-link">📦 Xem Sản Phẩm</a>
             <a href="#lien-he" class="nav-link">📞 Liên Hệ Admin</a>
-            <a href="/du_an_xuong/public/profile" class="nav-link">👤 Hồ Sơ Cá Nhân</a>
+            <a href="<?php echo $baseUrl; ?>/profile" class="nav-link">👤 Hồ Sơ Cá Nhân</a>
         </div>
 
         <!-- Welcome Section -->
@@ -385,11 +549,17 @@ if (!isset($_SESSION['user_id'])) {
                     <?php foreach ($products as $product): ?>
                         <div class="product-card">
                             <div class="product-image">
-                                <?php if (!empty($product['image'])): ?>
-                                    <img src="<?php echo htmlspecialchars($product['image']); ?>" alt="<?php echo htmlspecialchars($product['name']); ?>" style="width: 100%; height: 100%; object-fit: cover;">
-                                <?php else: ?>
-                                    <span>Hình Ảnh Sản Phẩm</span>
-                                <?php endif; ?>
+                                <?php 
+                                    $imgSrc = '';
+                                    if (!empty($product['image'])) {
+                                        $imgSrc = $baseUrl . htmlspecialchars($product['image']);
+                                    } else {
+                                        // Use placeholder image
+                                        $productName = urlencode($product['name'] ?? 'Product');
+                                        $imgSrc = 'https://via.placeholder.com/250x200?text=' . $productName;
+                                    }
+                                ?>
+                                <img src="<?php echo $imgSrc; ?>" alt="<?php echo htmlspecialchars($product['name']); ?>" style="width: 100%; height: 100%; object-fit: cover;" onerror="this.src='https://via.placeholder.com/250x200?text=<?php echo urlencode($product['name'] ?? 'Product'); ?>'">
                             </div>
                             <div class="product-content">
                                 <div class="product-name"><?php echo htmlspecialchars($product['name']); ?></div>
@@ -400,7 +570,10 @@ if (!isset($_SESSION['user_id'])) {
                                         echo number_format($price, 0, ',', '.') . ' VNĐ';
                                     ?>
                                 </div>
-                                <button class="contact-btn" onclick="document.location.href='#lien-he'">💬 Liên Hệ Để Mua</button>
+                                <div class="product-actions">
+                                    <a href="<?php echo $baseUrl; ?>/shop/<?php echo $product['id']; ?>" class="detail-btn">🔎 Xem Chi Tiết</a>
+                                    <button class="contact-btn" onclick="document.location.href='#lien-he'">💬 Liên Hệ Để Mua</button>
+                                </div>
                             </div>
                         </div>
                     <?php endforeach; ?>

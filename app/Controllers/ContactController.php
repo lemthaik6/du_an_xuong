@@ -32,8 +32,7 @@ class ContactController extends Controller
 
         if (!empty($errors)) {
             $this->setFlash('error', 'Vui lòng điền đầy đủ thông tin hợp lệ');
-            $redirectUrl = $this->auth->isCustomer() ? '/du_an_xuong/public/dashboard' : '/du_an_xuong/public/contact';
-            $this->redirect($redirectUrl);
+            $this->redirect('/du_an_xuong/public/contact');
             return;
         }
 
@@ -44,12 +43,14 @@ class ContactController extends Controller
         $message .= "Email: " . htmlspecialchars($post['email']) . "\n";
         $message .= "Chủ đề: " . htmlspecialchars($post['subject']) . "\n\n";
         $message .= "Nội dung:\n" . htmlspecialchars($post['message']);
+        if (!empty($post['product_id'])) {
+            $message .= "\n\nSản phẩm quan tâm: #" . htmlspecialchars($post['product_id']);
+        }
 
         // Có thể bỏ qua phần gửi email nếu server không hỗ trợ
         // mail($to, $subject, $message);
 
         $this->setFlash('success', 'Tin nhắn của bạn đã được gửi thành công. Cảm ơn bạn đã liên hệ!');
-        $redirectUrl = $this->auth->isCustomer() ? '/du_an_xuong/public/dashboard?success=1' : '/du_an_xuong/public/contact';
-        $this->redirect($redirectUrl);
+        $this->redirect('/du_an_xuong/public/contact');
     }
 }

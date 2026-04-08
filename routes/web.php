@@ -128,6 +128,56 @@ $router->get('/shop', ProductController::class . '@shop');
 $router->get('/shop/(\d+)', ProductController::class . '@details');
 
 // =====================
+// SETUP ROUTE (One-time database initialization)
+// =====================
+$router->get('/setup', function() {
+    // Read and execute database_setup.sql
+    $db = \Src\Database::getInstance();
+    $sqlFile = dirname(__DIR__) . '/database_setup.sql';
+    
+    if (!file_exists($sqlFile)) {
+        echo "<h1>❌ Error</h1><p>database_setup.sql not found</p>";
+        return;
+    }
+    
+    $sql = file_get_contents($sqlFile);
+    $statements = array_filter(
+        array_map('trim', explode(';', $sql)),
+        function($s) { return !empty($s) && !str_starts_with($s, '--'); }
+    );
+    
+    $success = 0;
+    $failed = 0;
+    
+    echo "<h1>🔧 Database Setup</h1>";
+    echo "<p>Initializing tables and sample data...</p>";
+    
+    foreach ($statements as $statement) {
+        if (empty(trim($statement))) continue;
+        try {
+            $db->getConnection()->query($statement);
+            $success++;
+        } catch (Exception $e) {
+            $failed++;
+        }
+    }
+    
+    echo "<p>✅ Executed: " . $success . " statements</p>";
+    
+    // Check final state
+    $result = $db->fetchOne("SELECT COUNT(*) as count FROM products WHERE status = 'active' AND stock > 0");
+    $activeCount = $result['count'] ?? 0;
+    
+    if ($activeCount > 0) {
+        echo "<p style='color: green; font-size: 18px; font-weight: bold;'>✅ Database Setup Complete!</p>";
+        echo "<p>Active products ready: " . $activeCount . "</p>";
+        echo "<p><a href='dashboard' style='background: #667eea; color: white; padding: 10px 20px; text-decoration: none; border-radius: 4px; display: inline-block;'>Go to Dashboard</a></p>";
+    } else {
+        echo "<p style='color: orange;'>⚠️ No active products found</p>";
+    }
+});
+
+// =====================
 // ERROR HANDLING
 // =====================
 $router->set404(function() {

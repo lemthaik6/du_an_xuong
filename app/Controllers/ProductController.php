@@ -198,20 +198,25 @@ class ProductController extends Controller
             return null;
         }
         
-        // Create unique filename
-        $uploadDir = __DIR__ . '/../../storage/uploads/products/';
+        // Create upload directory in public/uploads/products
+        $uploadDir = __DIR__ . '/../../public/uploads/products/';
         if (!is_dir($uploadDir)) {
-            mkdir($uploadDir, 0755, true);
+            if (!@mkdir($uploadDir, 0777, true)) {
+                $this->setFlash('warning', 'Không thể tạo thư mục upload');
+                return null;
+            }
         }
         
-        $newFilename = 'product_' . time() . '_' . rand(1000, 9999) . '.' . $ext;
+        $newFilename = 'product_' . time() . '_' . rand(10000, 99999) . '.' . $ext;
         $uploadPath = $uploadDir . $newFilename;
         
-        if (move_uploaded_file($file['tmp_name'], $uploadPath)) {
-            return 'storage/uploads/products/' . $newFilename;
+        if (@move_uploaded_file($file['tmp_name'], $uploadPath)) {
+            // Return web-accessible path
+            return '/uploads/products/' . $newFilename;
+        } else {
+            $this->setFlash('warning', 'Lỗi khi lưu file upload');
+            return null;
         }
-        
-        return null;
     }
 
     // ===== CUSTOMER SHOP =====

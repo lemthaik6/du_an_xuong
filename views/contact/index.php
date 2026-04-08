@@ -11,28 +11,29 @@
     
     <div class="main-content" style="flex: 1;">
         <!-- Header Card -->
+        <?php
+            $isCustomer = isset($_SESSION['role']) && $_SESSION['role'] === 'customer';
+            $cancelUrl = $this->auth->isLoggedIn() ? $baseUrl . '/dashboard' : $baseUrl . '/';
+        ?>
+        <?php $productId = htmlspecialchars($_GET['product_id'] ?? ''); ?>
         <div class="card" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; margin-bottom: 20px; padding: 30px;">
             <h2 style="margin: 0 0 10px 0; font-size: 28px;">📧 Liên Hệ Với Chúng Tôi</h2>
-            <p style="margin: 0; opacity: 0.9;">Gửi tin nhắn cho chúng tôi - chúng tôi sẽ trả lời sớm nhất có thể</p>
+            <p style="margin: 0; opacity: 0.9;">
+                <?php echo $isCustomer ? 'Gửi yêu cầu mua hàng hoặc hỏi thông tin sản phẩm, chúng tôi sẽ trả lời sớm nhất.' : 'Gửi tin nhắn cho chúng tôi - chúng tôi sẽ trả lời sớm nhất có thể.'; ?>
+            </p>
+            <?php if (!empty($productId)): ?>
+                <p style="margin: 16px 0 0 0; color: rgba(255,255,255,0.85); font-size: 14px;">Sản phẩm quan tâm: <strong>#<?php echo $productId; ?></strong></p>
+            <?php endif; ?>
         </div>
-
-        <?php if ($flash = $this->getFlash('success')): ?>
-            <div class="card" style="background: #d4edda; border: 1px solid #c3e6cb; color: #155724; padding: 15px; margin-bottom: 20px; border-radius: 4px;">
-                <strong>✓ Thành công!</strong> <?php echo htmlspecialchars($flash); ?>
-            </div>
-        <?php endif; ?>
-
-        <?php if ($flash = $this->getFlash('error')): ?>
-            <div class="card" style="background: #f8d7da; border: 1px solid #f5c6cb; color: #721c24; padding: 15px; margin-bottom: 20px; border-radius: 4px;">
-                <strong>✗ Lỗi!</strong> <?php echo htmlspecialchars($flash); ?>
-            </div>
-        <?php endif; ?>
 
         <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 20px;">
             <!-- Contact Form -->
             <div class="card">
                 <h3 style="margin-top: 0; margin-bottom: 20px;">✉️ Gửi Tin Nhắn</h3>
                 <form method="POST" action="<?php echo $baseUrl; ?>/contact">
+                    <?php if (!empty($productId)): ?>
+                        <input type="hidden" name="product_id" value="<?php echo $productId; ?>">
+                    <?php endif; ?>
                     <div style="margin-bottom: 20px;">
                         <label style="display: block; font-weight: bold; margin-bottom: 8px; color: #333;">
                             👤 Họ và Tên <span style="color: #e74c3c;">*</span>
@@ -90,7 +91,7 @@
 
                     <div style="display: flex; gap: 12px;">
                         <button type="submit" class="btn" style="background: #27ae60; color: white; padding: 12px 24px; border-radius: 6px; border: none; font-weight: 500; cursor: pointer; flex: 1;">✓ Gửi Tin Nhắn</button>
-                        <a href="<?php echo $baseUrl; ?>/dashboard" class="btn" style="background: #95a5a6; color: white; padding: 12px 24px; border-radius: 6px; text-decoration: none; font-weight: 500; text-align: center;">Hủy</a>
+                        <a href="<?php echo $cancelUrl; ?>" class="btn" style="background: #95a5a6; color: white; padding: 12px 24px; border-radius: 6px; text-decoration: none; font-weight: 500; text-align: center;">Hủy</a>
                     </div>
                 </form>
             </div>

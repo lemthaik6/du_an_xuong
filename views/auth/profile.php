@@ -1,3 +1,57 @@
+<?php if ($user['role'] === 'customer'): ?>
+<div style="display: flex; gap: 20px;">
+    <div class="sidebar-menu">
+        <h3>Menu</h3>
+        <a href="<?php echo $baseUrl; ?>/dashboard">📊 Dashboard</a>
+        <a href="<?php echo $baseUrl; ?>/shop">📦 Sản Phẩm</a>
+        <a href="<?php echo $baseUrl; ?>/contact">📧 Liên hệ</a>
+        <a href="<?php echo $baseUrl; ?>/profile">👤 Hồ sơ của tôi</a>
+    </div>
+    
+    <div class="main-content" style="flex: 1;">
+        <div class="card" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; margin-bottom: 20px; padding: 30px;">
+            <h2 style="margin: 0 0 10px 0; font-size: 28px;">👤 Hồ Sơ Khách Hàng</h2>
+            <p style="margin: 0; opacity: 0.9;">Thông tin hồ sơ của bạn trong giao diện khách hàng.</p>
+        </div>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin-bottom: 20px;">
+            <div style="background: #f8fafc; padding: 20px; border-radius: 12px; border-left: 4px solid #667eea;">
+                <p style="color: #4b5563; font-size: 12px; text-transform: uppercase; margin: 0 0 10px 0; letter-spacing: 0.5px;">👤 Tên đăng nhập</p>
+                <p style="font-size: 18px; font-weight: 700; margin: 0; color: #111827;"><?php echo htmlspecialchars($user['username']); ?></p>
+            </div>
+            <div style="background: #f8fafc; padding: 20px; border-radius: 12px; border-left: 4px solid #4f46e5;">
+                <p style="color: #4b5563; font-size: 12px; text-transform: uppercase; margin: 0 0 10px 0; letter-spacing: 0.5px;">📧 Email</p>
+                <p style="font-size: 18px; font-weight: 700; margin: 0; color: #111827;"><?php echo htmlspecialchars($user['email']); ?></p>
+            </div>
+            <div style="background: #f8fafc; padding: 20px; border-radius: 12px; border-left: 4px solid #10b981;">
+                <p style="color: #4b5563; font-size: 12px; text-transform: uppercase; margin: 0 0 10px 0; letter-spacing: 0.5px;">👤 Họ và tên</p>
+                <p style="font-size: 18px; font-weight: 700; margin: 0; color: #111827;"><?php echo htmlspecialchars($user['full_name']); ?></p>
+            </div>
+            <div style="background: #f8fafc; padding: 20px; border-radius: 12px; border-left: 4px solid #f97316;">
+                <p style="color: #4b5563; font-size: 12px; text-transform: uppercase; margin: 0 0 10px 0; letter-spacing: 0.5px;">📱 Số điện thoại</p>
+                <p style="font-size: 18px; font-weight: 700; margin: 0; color: #111827;"><?php echo htmlspecialchars($user['phone'] ?? 'Chưa cập nhật'); ?></p>
+            </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin-bottom: 24px;">
+            <div style="background: #ffffff; padding: 22px; border-radius: 16px; border: 1px solid rgba(148, 163, 184, 0.18);">
+                <p style="margin: 0 0 10px 0; color: #6b7280; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px;">Vai trò</p>
+                <p style="margin: 0; font-size: 16px; font-weight: 700; color: #111827;"><?php echo '👤 Khách hàng'; ?></p>
+            </div>
+            <div style="background: #ffffff; padding: 22px; border-radius: 16px; border: 1px solid rgba(148, 163, 184, 0.18);">
+                <p style="margin: 0 0 10px 0; color: #6b7280; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px;">Trạng thái</p>
+                <p style="margin: 0; font-size: 16px; font-weight: 700; color: #111827;"><span style="display: inline-block; padding: 6px 12px; border-radius: 999px; color: white; background: <?php echo $user['status'] === 'active' ? '#10b981' : '#ef4444'; ?>;"><?php echo $user['status'] === 'active' ? 'Hoạt động' : 'Bị khóa'; ?></span></p>
+            </div>
+        </div>
+
+        <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+            <a href="<?php echo $baseUrl; ?>/profile/edit" class="btn" style="background: #3b82f6; color: white; padding: 12px 24px; border-radius: 999px; text-decoration: none; font-weight: 700;">✏️ Chỉnh Sửa Hồ Sơ</a>
+            <a href="<?php echo $baseUrl; ?>/profile/change-password" class="btn" style="background: #f59e0b; color: white; padding: 12px 24px; border-radius: 999px; text-decoration: none; font-weight: 700;">🔒 Đổi Mật Khẩu</a>
+            <a href="<?php echo $baseUrl; ?>/dashboard" class="btn" style="background: #6b7280; color: white; padding: 12px 24px; border-radius: 999px; text-decoration: none; font-weight: 700;">← Quay Lại</a>
+        </div>
+    </div>
+</div>
+<?php else: ?>
 <div style="display: flex; gap: 20px;">
     <div class="sidebar-menu">
         <h3>Menu</h3>
@@ -81,3 +135,4 @@
         </div>
     </div>
 </div>
+<?php endif; ?>

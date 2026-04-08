@@ -185,11 +185,9 @@
                             <td><?php echo $product['id']; ?></td>
                             <td>
                                 <?php if (!empty($product['image'])): ?>
-                                    <img src="<?php echo htmlspecialchars($product['image']); ?>" alt="<?php echo htmlspecialchars($product['name']); ?>" style="width: 80px; height: 80px; object-fit: cover; border-radius: 4px;">
+                                    <img src="<?php echo $baseUrl; ?><?php echo htmlspecialchars($product['image']); ?>" alt="<?php echo htmlspecialchars($product['name']); ?>" style="width: 80px; height: 80px; object-fit: cover; border-radius: 4px; border: 1px solid #ddd;">
                                 <?php else: ?>
-                                    <div style="width: 80px; height: 80px; background: #ecf0f1; border-radius: 4px; display: flex; align-items: center; justify-content: center; color: #999;">
-                                        📷
-                                    </div>
+                                    <img src="https://via.placeholder.com/80x80?text=<?php echo urlencode(substr($product['name'], 0, 10)); ?>" alt="<?php echo htmlspecialchars($product['name']); ?>" style="width: 80px; height: 80px; object-fit: cover; border-radius: 4px; border: 1px solid #ddd;">
                                 <?php endif; ?>
                             </td>
                             <td>

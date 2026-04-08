@@ -21,11 +21,15 @@
             <?php foreach ($products as $product): ?>
                 <div class="card" style="padding: 15px; text-align: center; transition: transform 0.3s; cursor: pointer;" onmouseover="this.style.transform='translateY(-5px)'" onmouseout="this.style.transform='translateY(0)'">
                     <div style="background: #ecf0f1; height: 200px; border-radius: 8px; display: flex; align-items: center; justify-content: center; margin-bottom: 15px; overflow: hidden;">
-                        <?php if (!empty($product['image'])): ?>
-                            <img src="<?php echo htmlspecialchars($product['image']); ?>" alt="<?php echo htmlspecialchars($product['name']); ?>" style="width: 100%; height: 100%; object-fit: cover;">
-                        <?php else: ?>
-                            <div style="font-size: 50px;">📦</div>
-                        <?php endif; ?>
+                        <?php 
+                            $imgSrc = '';
+                            if (!empty($product['image'])) {
+                                $imgSrc = $baseUrl . htmlspecialchars($product['image']);
+                            } else {
+                                $imgSrc = 'https://via.placeholder.com/250x200?text=' . urlencode(substr($product['name'], 0, 15));
+                            }
+                        ?>
+                        <img src="<?php echo $imgSrc; ?>" alt="<?php echo htmlspecialchars($product['name']); ?>" style="width: 100%; height: 100%; object-fit: cover;" onerror="this.src='https://via.placeholder.com/250x200?text=<?php echo urlencode(substr($product['name'], 0, 15)); ?>'">
                     </div>
                     
                     <h3 style="margin: 0 0 10px 0; font-size: 16px; color: #2c3e50;">
