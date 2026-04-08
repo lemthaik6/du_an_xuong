@@ -5,6 +5,7 @@
         <a href="<?php echo $baseUrl; ?>/dashboard">📊 Dashboard</a>
         <a href="<?php echo $baseUrl; ?>/users">👥 Quản lý Người dùng</a>
         <a href="<?php echo $baseUrl; ?>/categories">📑 Quản lý Danh mục</a>
+        <a href="<?php echo $baseUrl; ?>/products">📦 Quản lý Sản phẩm</a>
         <a href="<?php echo $baseUrl; ?>/projects">📌 Quản lý Dự án</a>
         <a href="<?php echo $baseUrl; ?>/tasks">✓ Quản lý Tác vụ</a>
         <a href="<?php echo $baseUrl; ?>/teams">👨‍💼 Quản lý Đội nhóm</a>
@@ -19,6 +20,7 @@
         <a href="<?php echo $baseUrl; ?>/teams">👨‍💼 Đội nhóm</a>
         <a href="<?php echo $baseUrl; ?>/contact">📧 Liên hệ</a>
         <a href="<?php echo $baseUrl; ?>/profile">⚙️ Hồ sơ của tôi</a>
+        <a href="<?php echo $baseUrl; ?>/logout">🚪 Đăng xuất</a>
     </div>
     <?php endif; ?>
     

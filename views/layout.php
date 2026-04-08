@@ -22,26 +22,7 @@
             margin: 0 auto;
             padding: 20px;
         }
-        
-        header {
-            background: #2c3e50;
-            color: white;
-            padding: 20px 0;
-            margin-bottom: 30px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-        
-        header .container {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        
-        header h1 {
-            font-size: 24px;
-            margin: 0;
-        }
-        
+
         nav {
             display: flex;
             gap: 20px;
@@ -335,22 +316,6 @@
     </style>
 </head>
 <body>
-    <header>
-        <div class="container">
-            <h1>📊 Du An Xuong</h1>
-            <nav>
-                <?php if (isset($_SESSION['user_id'])): ?>
-                    <span>Xin chào, <?php echo htmlspecialchars($_SESSION['full_name'] ?? 'User'); ?></span>
-                    <a href="<?php echo $baseUrl; ?>/profile">Hồ sơ</a>
-                    <a href="<?php echo $baseUrl; ?>/logout">Đăng xuất</a>
-                <?php else: ?>
-                    <a href="<?php echo $baseUrl; ?>/login">Đăng nhập</a>
-                    <a href="<?php echo $baseUrl; ?>/register">Đăng ký</a>
-                <?php endif; ?>
-            </nav>
-        </div>
-    </header>
-    
     <div class="container">
         <?php if (isset($flash)): ?>
             <div class="flash <?php echo htmlspecialchars($flash['type']); ?>">

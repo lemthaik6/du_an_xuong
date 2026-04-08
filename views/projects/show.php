@@ -115,9 +115,8 @@
     <?php endif; ?>
     
     <div class="card">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+        <div style="margin-bottom: 16px;">
             <h3 style="margin: 0;">✓ Tác Vụ Trong Dự Án</h3>
-            <a href="<?php echo $baseUrl; ?>/tasks/create?project_id=<?php echo $project['id']; ?>" class="btn btn-success" style="padding: 8px 16px;">+ Thêm Tác Vụ</a>
         </div>
         <?php if (!empty($tasks)): ?>
             <div style="display: grid; gap: 12px;">

@@ -509,7 +509,6 @@ if (!isset($_SESSION['user_id'])) {
             </div>
             <div class="user-info">
                 <p><?php echo htmlspecialchars($user['full_name'] ?? $user['username'] ?? 'Khách'); ?></p>
-                <a href="<?php echo $baseUrl; ?>/profile" class="logout-btn" style="background: #2196F3; margin-right: 10px;">Cài Đặt Tài Khoản</a>
                 <a href="<?php echo $baseUrl; ?>/logout" class="logout-btn">Đăng Xuất</a>
             </div>
         </div>

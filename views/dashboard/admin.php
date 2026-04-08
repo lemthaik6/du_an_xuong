@@ -9,6 +9,7 @@
         <a href="<?php echo $baseUrl; ?>/tasks">✓ Quản lý Tác vụ</a>
         <a href="<?php echo $baseUrl; ?>/teams">👨‍💼 Quản lý Đội nhóm</a>
         <a href="<?php echo $baseUrl; ?>/profile">⚙️ Hồ sơ của tôi</a>
+        <a href="<?php echo $baseUrl; ?>/logout">🚪 Đăng xuất</a>
     </div>
     
     <div class="main-content" style="flex: 1;">
